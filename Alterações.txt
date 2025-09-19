@@ -1,0 +1,1 @@
+Alterei a tabela de produtos e presilhas para uma só, mudando apenas o tipo de produto.
