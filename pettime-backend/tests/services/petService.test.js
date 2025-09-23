@@ -150,7 +150,7 @@ describe('Pet Service Tests', () => {
 
       expect(db.Pet.findByPk).toHaveBeenCalledWith(petId);
       expect(mockPet.update).toHaveBeenCalledWith({ deletado: true });
-      expect(result).toBe(true);
+      expect(result).toEqual({"message": "Pet excluído logicamente com sucesso"});
     });
 
     test('should throw error when pet not found for deletion', async () => {
