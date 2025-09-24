@@ -3,7 +3,6 @@ import 'package:pettime_frontend/core/utils/validators.dart';
 
 void main() {
   group('FormValidator - Testes Unitários', () {
-    
     group('Validação de Campo Obrigatório', () {
       test('deve retornar null para campo válido', () {
         final resultado = FormValidator.validarCampoObrigatorio('João', 'Nome');
@@ -21,7 +20,10 @@ void main() {
       });
 
       test('deve retornar erro para campo com apenas espaços', () {
-        final resultado = FormValidator.validarCampoObrigatorio('   ', 'Telefone');
+        final resultado = FormValidator.validarCampoObrigatorio(
+          '   ',
+          'Telefone',
+        );
         expect(resultado, 'Telefone é obrigatório');
       });
 
@@ -38,7 +40,9 @@ void main() {
       });
 
       test('deve validar email com subdomínio', () {
-        final resultado = FormValidator.validarEmail('user@mail.empresa.com.br');
+        final resultado = FormValidator.validarEmail(
+          'user@mail.empresa.com.br',
+        );
         expect(resultado, null);
       });
 
@@ -129,12 +133,18 @@ void main() {
 
     group('Validação de Confirmação de Senha', () {
       test('deve validar confirmação correta', () {
-        final resultado = FormValidator.validarConfirmacaoSenha('senha123', 'senha123');
+        final resultado = FormValidator.validarConfirmacaoSenha(
+          'senha123',
+          'senha123',
+        );
         expect(resultado, null);
       });
 
       test('deve invalidar confirmação null', () {
-        final resultado = FormValidator.validarConfirmacaoSenha('senha123', null);
+        final resultado = FormValidator.validarConfirmacaoSenha(
+          'senha123',
+          null,
+        );
         expect(resultado, 'Confirmação de senha é obrigatória');
       });
 
@@ -144,12 +154,18 @@ void main() {
       });
 
       test('deve invalidar senhas diferentes', () {
-        final resultado = FormValidator.validarConfirmacaoSenha('senha123', 'senha456');
+        final resultado = FormValidator.validarConfirmacaoSenha(
+          'senha123',
+          'senha456',
+        );
         expect(resultado, 'Senhas não coincidem');
       });
 
       test('deve validar senhas idênticas com caracteres especiais', () {
-        final resultado = FormValidator.validarConfirmacaoSenha('senh@123!', 'senh@123!');
+        final resultado = FormValidator.validarConfirmacaoSenha(
+          'senh@123!',
+          'senh@123!',
+        );
         expect(resultado, null);
       });
     });

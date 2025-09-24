@@ -66,7 +66,9 @@ void main() {
       });
 
       test('deve validar email com subdomínio', () {
-        final usuario = usuarioValido.copyWith(email: 'joao@mail.empresa.com.br');
+        final usuario = usuarioValido.copyWith(
+          email: 'joao@mail.empresa.com.br',
+        );
         expect(usuario.isEmailValid(), true);
       });
     });
@@ -120,7 +122,7 @@ void main() {
 
     group('Status do Usuário', () {
       test('deve identificar usuário novo (sem ID)', () {
-        final usuario = usuarioValido.copyWith(id: null);
+        final usuario = usuarioValido.copyWith(clearId: true);
         expect(usuario.isNovo(), true);
       });
 
@@ -130,12 +132,16 @@ void main() {
 
       test('deve identificar usuário criado recentemente', () {
         final agora = DateTime.now();
-        final usuario = usuarioValido.copyWith(dataCriacao: agora.subtract(Duration(hours: 12)));
+        final usuario = usuarioValido.copyWith(
+          dataCriacao: agora.subtract(Duration(hours: 12)),
+        );
         expect(usuario.isCriadoRecentemente(), true);
       });
 
       test('deve identificar usuário não criado recentemente', () {
-        final usuario = usuarioValido.copyWith(dataCriacao: DateTime.now().subtract(Duration(days: 2)));
+        final usuario = usuarioValido.copyWith(
+          dataCriacao: DateTime.now().subtract(Duration(days: 2)),
+        );
         expect(usuario.isCriadoRecentemente(), false);
       });
 
@@ -153,7 +159,7 @@ void main() {
       });
 
       test('deve retornar 0 para usuário sem data de criação', () {
-        final usuario = usuarioValido.copyWith(dataCriacao: null);
+        final usuario = usuarioValido.copyWith(clearDataCriacao: true);
         expect(usuario.getIdadeContaEmDias(), 0);
       });
 
@@ -192,7 +198,7 @@ void main() {
     group('Serialização JSON', () {
       test('deve converter para JSON corretamente', () {
         final json = usuarioValido.toJson();
-        
+
         expect(json['id'], 1);
         expect(json['nome'], 'João Silva');
         expect(json['email'], 'joao@email.com');
@@ -289,7 +295,7 @@ void main() {
     group('ToString', () {
       test('deve retornar representação em string', () {
         final string = usuarioValido.toString();
-        
+
         expect(string, contains('Usuario'));
         expect(string, contains('id: 1'));
         expect(string, contains('nome: João Silva'));

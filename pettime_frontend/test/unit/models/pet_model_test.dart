@@ -76,7 +76,7 @@ void main() {
       });
 
       test('deve retornar 0 para pet sem data de nascimento', () {
-        final pet = petValido.copyWith(dataNascimento: null);
+        final pet = petValido.copyWith(clearDataNascimento: true);
         expect(pet.getIdadeEmAnos(), 0);
         expect(pet.getIdadeEmMeses(), 0);
       });
@@ -112,7 +112,7 @@ void main() {
 
       test('deve formatar idade de 1 mês', () {
         final umMes = petValido.copyWith(
-          dataNascimento: DateTime.now().subtract(Duration(days: 30)),
+          dataNascimento: DateTime.now().subtract(Duration(days: 32)),
         );
         expect(umMes.getIdadeFormatada(), '1 mês');
       });
@@ -172,70 +172,46 @@ void main() {
 
     group('Classificação de Peso', () {
       test('deve classificar peso de gato corretamente', () {
-        final gato = petValido.copyWith(
-          especie: 'Gato',
-          peso: 4.0,
-        );
+        final gato = petValido.copyWith(especie: 'Gato', peso: 4.0);
         expect(gato.getClassificacaoPeso(), 'Peso ideal');
       });
 
       test('deve classificar gato abaixo do peso', () {
-        final gato = petValido.copyWith(
-          especie: 'Gato',
-          peso: 2.0,
-        );
+        final gato = petValido.copyWith(especie: 'Gato', peso: 2.0);
         expect(gato.getClassificacaoPeso(), 'Abaixo do peso');
       });
 
       test('deve classificar gato com sobrepeso', () {
-        final gato = petValido.copyWith(
-          especie: 'Gato',
-          peso: 6.0,
-        );
+        final gato = petValido.copyWith(especie: 'Gato', peso: 6.0);
         expect(gato.getClassificacaoPeso(), 'Sobrepeso');
       });
 
       test('deve classificar gato obeso', () {
-        final gato = petValido.copyWith(
-          especie: 'Gato',
-          peso: 8.0,
-        );
+        final gato = petValido.copyWith(especie: 'Gato', peso: 8.0);
         expect(gato.getClassificacaoPeso(), 'Obeso');
       });
 
       test('deve classificar porte de cão', () {
         // Cão pequeno
-        final pequeno = petValido.copyWith(
-          especie: 'Cão',
-          peso: 3.0,
-        );
+        final pequeno = petValido.copyWith(especie: 'Cão', peso: 3.0);
         expect(pequeno.getClassificacaoPeso(), 'Pequeno porte');
 
         // Cão médio
-        final medio = petValido.copyWith(
-          especie: 'Cão',
-          peso: 20.0,
-        );
+        final medio = petValido.copyWith(especie: 'Cão', peso: 20.0);
         expect(medio.getClassificacaoPeso(), 'Médio porte');
 
         // Cão grande
-        final grande = petValido.copyWith(
-          especie: 'Cão',
-          peso: 35.0,
-        );
+        final grande = petValido.copyWith(especie: 'Cão', peso: 35.0);
         expect(grande.getClassificacaoPeso(), 'Grande porte');
       });
 
       test('deve retornar null para pet sem peso', () {
-        final pet = petValido.copyWith(peso: null);
+        final pet = petValido.copyWith(clearPeso: true);
         expect(pet.getClassificacaoPeso(), null);
       });
 
       test('deve tratar espécie não reconhecida', () {
-        final exotico = petValido.copyWith(
-          especie: 'Iguana',
-          peso: 2.5,
-        );
+        final exotico = petValido.copyWith(especie: 'Iguana', peso: 2.5);
         expect(exotico.getClassificacaoPeso(), 'Peso registrado: 2.5kg');
       });
     });
@@ -316,11 +292,7 @@ void main() {
       });
 
       test('deve tratar campos opcionais no JSON', () {
-        final json = {
-          'nome': 'Bolinha',
-          'especie': 'Hamster',
-          'raca': 'Sírio',
-        };
+        final json = {'nome': 'Bolinha', 'especie': 'Hamster', 'raca': 'Sírio'};
 
         final pet = Pet.fromJson(json);
 
@@ -334,10 +306,7 @@ void main() {
 
     group('CopyWith', () {
       test('deve criar cópia com campos alterados', () {
-        final copia = petValido.copyWith(
-          nome: 'Max',
-          peso: 30.0,
-        );
+        final copia = petValido.copyWith(nome: 'Max', peso: 30.0);
 
         expect(copia.id, petValido.id);
         expect(copia.nome, 'Max');

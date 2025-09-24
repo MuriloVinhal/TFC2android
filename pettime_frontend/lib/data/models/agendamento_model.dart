@@ -38,10 +38,10 @@ class Agendamento {
   bool isHoje() {
     final hoje = DateTime.now();
     final dataAgendamento = dataHora;
-    
+
     return hoje.year == dataAgendamento.year &&
-           hoje.month == dataAgendamento.month &&
-           hoje.day == dataAgendamento.day;
+        hoje.month == dataAgendamento.month &&
+        hoje.day == dataAgendamento.day;
   }
 
   /// Verifica se o agendamento é esta semana
@@ -49,51 +49,51 @@ class Agendamento {
     final agora = DateTime.now();
     final inicioSemana = agora.subtract(Duration(days: agora.weekday - 1));
     final fimSemana = inicioSemana.add(Duration(days: 6));
-    
+
     return dataHora.isAfter(inicioSemana) && dataHora.isBefore(fimSemana);
   }
 
   /// Calcula quantos dias faltam para o agendamento
   int diasParaAgendamento() {
     if (!isFuturo()) return 0;
-    
+
     final agora = DateTime.now();
     final diferenca = dataHora.difference(agora);
-    
+
     return diferenca.inDays;
   }
 
   /// Calcula quantas horas faltam para o agendamento
   int horasParaAgendamento() {
     if (!isFuturo()) return 0;
-    
+
     final agora = DateTime.now();
     final diferenca = dataHora.difference(agora);
-    
+
     return diferenca.inHours;
   }
 
   /// Retorna descrição do tempo restante
   String getTempoRestante() {
     if (!isFuturo()) return 'Vencido';
-    
+
     final dias = diasParaAgendamento();
     final horas = horasParaAgendamento();
-    
+
     if (dias > 0) {
       if (dias == 1) return 'Amanhã';
       return 'Em $dias dias';
     }
-    
+
     if (horas > 1) {
       return 'Em $horas horas';
     }
-    
+
     final minutos = dataHora.difference(DateTime.now()).inMinutes;
     if (minutos > 0) {
       return 'Em $minutos minutos';
     }
-    
+
     return 'Agora';
   }
 
@@ -102,7 +102,7 @@ class Agendamento {
     if (!isFuturo()) return false;
     if (status == StatusAgendamento.cancelado) return false;
     if (status == StatusAgendamento.concluido) return false;
-    
+
     final horasRestantes = horasParaAgendamento();
     return horasRestantes >= 24;
   }
@@ -128,7 +128,7 @@ class Agendamento {
   double? getValorComDesconto({double percentualDesconto = 0}) {
     if (preco == null) return null;
     if (percentualDesconto <= 0) return preco;
-    
+
     final desconto = preco! * (percentualDesconto / 100);
     return preco! - desconto;
   }
@@ -136,16 +136,27 @@ class Agendamento {
   /// Formata data e hora para exibição
   String getDataHoraFormatada() {
     final meses = [
-      '', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
-      'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'
+      '',
+      'Jan',
+      'Fev',
+      'Mar',
+      'Abr',
+      'Mai',
+      'Jun',
+      'Jul',
+      'Ago',
+      'Set',
+      'Out',
+      'Nov',
+      'Dez',
     ];
-    
+
     final dia = dataHora.day.toString().padLeft(2, '0');
     final mes = meses[dataHora.month];
     final ano = dataHora.year;
     final hora = dataHora.hour.toString().padLeft(2, '0');
     final minuto = dataHora.minute.toString().padLeft(2, '0');
-    
+
     return '$dia/$mes/$ano às ${hora}:${minuto}';
   }
 
@@ -203,11 +214,11 @@ class Agendamento {
       status: _statusFromString(json['status']),
       preco: json['preco']?.toDouble(),
       veterinarioId: json['veterinarioId'],
-      dataCriacao: json['dataCriacao'] != null 
-          ? DateTime.parse(json['dataCriacao']) 
+      dataCriacao: json['dataCriacao'] != null
+          ? DateTime.parse(json['dataCriacao'])
           : null,
-      dataAtualizacao: json['dataAtualizacao'] != null 
-          ? DateTime.parse(json['dataAtualizacao']) 
+      dataAtualizacao: json['dataAtualizacao'] != null
+          ? DateTime.parse(json['dataAtualizacao'])
           : null,
     );
   }
@@ -232,7 +243,7 @@ class Agendamento {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    
+
     return other is Agendamento &&
         other.id == id &&
         other.petId == petId &&

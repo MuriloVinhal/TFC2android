@@ -3,7 +3,6 @@ import 'package:pettime_frontend/core/utils/date_utils.dart';
 
 void main() {
   group('DateUtils - Testes Unitários', () {
-    
     group('Formatação de Data', () {
       test('deve formatar data brasileira corretamente', () {
         final data = DateTime(2023, 6, 15);
@@ -40,14 +39,22 @@ void main() {
 
       test('deve calcular idade para aniversário não chegado', () {
         final agora = DateTime.now();
-        final nascimento = DateTime(agora.year - 25, agora.month + 1, agora.day);
+        final nascimento = DateTime(
+          agora.year - 25,
+          agora.month + 1,
+          agora.day,
+        );
         final idade = DateUtils.calcularIdade(nascimento);
         expect(idade, 24); // Ainda não fez aniversário este ano
       });
 
       test('deve calcular idade para aniversário já passou', () {
         final agora = DateTime.now();
-        final nascimento = DateTime(agora.year - 25, agora.month - 1, agora.day);
+        final nascimento = DateTime(
+          agora.year - 25,
+          agora.month - 1,
+          agora.day,
+        );
         final idade = DateUtils.calcularIdade(nascimento);
         expect(idade, 25); // Já fez aniversário este ano
       });
@@ -112,10 +119,10 @@ void main() {
       test('deve identificar se é nesta semana', () {
         final hoje = DateTime.now();
         expect(DateUtils.isNestaSemana(hoje), true);
-        
+
         final inicioSemana = hoje.subtract(Duration(days: hoje.weekday - 1));
         expect(DateUtils.isNestaSemana(inicioSemana), true);
-        
+
         final fimSemana = inicioSemana.add(Duration(days: 6));
         expect(DateUtils.isNestaSemana(fimSemana), true);
       });
@@ -123,7 +130,7 @@ void main() {
       test('deve identificar se é neste mês', () {
         final hoje = DateTime.now();
         expect(DateUtils.isNesteMes(hoje), true);
-        
+
         final primeiroDia = DateTime(hoje.year, hoje.month, 1);
         expect(DateUtils.isNesteMes(primeiroDia), true);
       });
@@ -131,10 +138,10 @@ void main() {
       test('deve identificar se é neste ano', () {
         final hoje = DateTime.now();
         expect(DateUtils.isNesteAno(hoje), true);
-        
+
         final janeiro = DateTime(hoje.year, 1, 1);
         expect(DateUtils.isNesteAno(janeiro), true);
-        
+
         final anoPassado = DateTime(hoje.year - 1, 12, 31);
         expect(DateUtils.isNesteAno(anoPassado), false);
       });
@@ -155,7 +162,7 @@ void main() {
 
       test('deve retornar nomes dos dias da semana corretos', () {
         expect(DateUtils.getNomeDiaSemana(1), 'Segunda-feira');
-        expect(DateUtils.getNomeDiaSemana(5), 'Quinta-feira');
+        expect(DateUtils.getNomeDiaSemana(4), 'Quinta-feira');
         expect(DateUtils.getNomeDiaSemana(7), 'Domingo');
       });
 
@@ -204,7 +211,10 @@ void main() {
       test('deve identificar anos não bissextos', () {
         expect(DateUtils.isAnoBissexto(2023), false);
         expect(DateUtils.isAnoBissexto(2021), false);
-        expect(DateUtils.isAnoBissexto(1900), false); // Divisível por 100 mas não por 400
+        expect(
+          DateUtils.isAnoBissexto(1900),
+          false,
+        ); // Divisível por 100 mas não por 400
       });
 
       test('deve calcular dias no mês corretamente', () {
@@ -220,7 +230,7 @@ void main() {
       test('deve identificar dia útil', () {
         final segunda = DateTime(2023, 6, 12); // Segunda-feira
         expect(DateUtils.isDiaUtil(segunda), true);
-        
+
         final sexta = DateTime(2023, 6, 16); // Sexta-feira
         expect(DateUtils.isDiaUtil(sexta), true);
       });
@@ -229,7 +239,7 @@ void main() {
         final sabado = DateTime(2023, 6, 17); // Sábado
         expect(DateUtils.isDiaUtil(sabado), false);
         expect(DateUtils.isFimDeSemana(sabado), true);
-        
+
         final domingo = DateTime(2023, 6, 18); // Domingo
         expect(DateUtils.isDiaUtil(domingo), false);
         expect(DateUtils.isFimDeSemana(domingo), true);

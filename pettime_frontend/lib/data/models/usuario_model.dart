@@ -37,7 +37,7 @@ class Usuario {
   bool isTelefoneValid() {
     // Remove caracteres especiais
     final telefoneNumeros = telefone.replaceAll(RegExp(r'[^\d]'), '');
-    
+
     // Valida se tem 10 ou 11 dígitos (fixo ou celular)
     return telefoneNumeros.length == 10 || telefoneNumeros.length == 11;
   }
@@ -45,7 +45,7 @@ class Usuario {
   /// Formata o telefone para exibição
   String getTelefoneFormatado() {
     final numeros = telefone.replaceAll(RegExp(r'[^\d]'), '');
-    
+
     if (numeros.length == 11) {
       // Celular: (11) 99999-9999
       return '(${numeros.substring(0, 2)}) ${numeros.substring(2, 7)}-${numeros.substring(7)}';
@@ -53,7 +53,7 @@ class Usuario {
       // Fixo: (11) 9999-9999
       return '(${numeros.substring(0, 2)}) ${numeros.substring(2, 6)}-${numeros.substring(6)}';
     }
-    
+
     return telefone; // Retorna original se inválido
   }
 
@@ -63,29 +63,29 @@ class Usuario {
   /// Verifica se o usuário foi criado recentemente (últimas 24h)
   bool isCriadoRecentemente() {
     if (dataCriacao == null) return false;
-    
+
     final agora = DateTime.now();
     final diferencaHoras = agora.difference(dataCriacao!).inHours;
-    
+
     return diferencaHoras <= 24;
   }
 
   /// Calcula a idade da conta em dias
   int getIdadeContaEmDias() {
     if (dataCriacao == null) return 0;
-    
+
     return DateTime.now().difference(dataCriacao!).inDays;
   }
 
   /// Gera iniciais do nome para avatar
   String getIniciais() {
     final palavras = nome.trim().split(' ');
-    
+
     if (palavras.isEmpty) return 'U';
     if (palavras.length == 1) {
       return palavras[0].isNotEmpty ? palavras[0][0].toUpperCase() : 'U';
     }
-    
+
     return '${palavras[0][0]}${palavras[palavras.length - 1][0]}'.toUpperCase();
   }
 
@@ -99,14 +99,16 @@ class Usuario {
     DateTime? dataCriacao,
     DateTime? dataAtualizacao,
     bool? ativo,
+    bool clearId = false,
+    bool clearDataCriacao = false,
   }) {
     return Usuario(
-      id: id ?? this.id,
+      id: clearId ? null : (id ?? this.id),
       nome: nome ?? this.nome,
       email: email ?? this.email,
       telefone: telefone ?? this.telefone,
       endereco: endereco ?? this.endereco,
-      dataCriacao: dataCriacao ?? this.dataCriacao,
+      dataCriacao: clearDataCriacao ? null : (dataCriacao ?? this.dataCriacao),
       dataAtualizacao: dataAtualizacao ?? this.dataAtualizacao,
       ativo: ativo ?? this.ativo,
     );
@@ -134,11 +136,11 @@ class Usuario {
       email: json['email'] ?? '',
       telefone: json['telefone'] ?? '',
       endereco: json['endereco'],
-      dataCriacao: json['dataCriacao'] != null 
-          ? DateTime.parse(json['dataCriacao']) 
+      dataCriacao: json['dataCriacao'] != null
+          ? DateTime.parse(json['dataCriacao'])
           : null,
-      dataAtualizacao: json['dataAtualizacao'] != null 
-          ? DateTime.parse(json['dataAtualizacao']) 
+      dataAtualizacao: json['dataAtualizacao'] != null
+          ? DateTime.parse(json['dataAtualizacao'])
           : null,
       ativo: json['ativo'] ?? true,
     );
@@ -147,7 +149,7 @@ class Usuario {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    
+
     return other is Usuario &&
         other.id == id &&
         other.nome == nome &&

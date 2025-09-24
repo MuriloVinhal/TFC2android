@@ -1,5 +1,4 @@
 class FormValidator {
-  
   /// Valida se uma string não está vazia
   static String? validarCampoObrigatorio(String? valor, [String? nomeCampo]) {
     if (valor == null || valor.trim().isEmpty) {
@@ -15,7 +14,7 @@ class FormValidator {
     }
 
     final emailRegex = RegExp(
-      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
     );
 
     if (!emailRegex.hasMatch(email)) {
@@ -115,13 +114,14 @@ class FormValidator {
       return 'Nome muito longo (máximo 100 caracteres)';
     }
 
-    // Verifica se contém apenas letras, espaços e alguns caracteres especiais
-    if (!RegExp(r'^[a-zA-Z\s\-\.]+$').hasMatch(nomeLimpo)) {
+    // Verifica se contém apenas letras (incluindo acentos), espaços e hífens
+    if (!RegExp(r'^[a-zA-ZÀ-ÿ\s\-\.]+$').hasMatch(nomeLimpo)) {
       return 'Nome contém caracteres inválidos';
     }
 
     // Verifica se tem pelo menos um espaço (nome e sobrenome)
-    if (!nomeLimpo.contains(' ')) {
+    final palavras = nomeLimpo.split(' ').where((p) => p.isNotEmpty).toList();
+    if (palavras.length < 2) {
       return 'Digite nome e sobrenome';
     }
 
@@ -161,7 +161,7 @@ class FormValidator {
     }
 
     final peso = double.tryParse(pesoStr.replaceAll(',', '.'));
-    
+
     if (peso == null) {
       return 'Digite um peso válido';
     }
@@ -253,7 +253,7 @@ class FormValidator {
     }
 
     final horarioRegex = RegExp(r'^([01]\d|2[0-3]):([0-5]\d)$');
-    
+
     if (!horarioRegex.hasMatch(horario)) {
       return 'Digite um horário válido (HH:mm)';
     }

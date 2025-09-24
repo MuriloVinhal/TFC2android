@@ -3,7 +3,6 @@ import 'package:pettime_frontend/core/utils/string_utils.dart';
 
 void main() {
   group('StringUtils - Testes Unitários', () {
-    
     group('Capitalização', () {
       test('deve capitalizar primeira letra de cada palavra', () {
         final resultado = StringUtils.capitalizar('joão silva santos');
@@ -210,7 +209,10 @@ void main() {
       });
 
       test('deve gerar três iniciais', () {
-        final resultado = StringUtils.gerarIniciais('João Silva Santos', maximo: 3);
+        final resultado = StringUtils.gerarIniciais(
+          'João Silva Santos',
+          maximo: 3,
+        );
         expect(resultado, 'JSS');
       });
 
@@ -287,11 +289,16 @@ void main() {
     group('Mascaramento', () {
       test('deve mascarar string padrão', () {
         final resultado = StringUtils.mascarar('joao@email.com');
-        expect(resultado, 'joa*****com');
+        expect(resultado, 'joa********com');
       });
 
       test('deve usar configuração customizada', () {
-        final resultado = StringUtils.mascarar('12345678901', inicioVisivel: 3, fimVisivel: 2, mascara: 'X');
+        final resultado = StringUtils.mascarar(
+          '12345678901',
+          inicioVisivel: 3,
+          fimVisivel: 2,
+          mascara: 'X',
+        );
         expect(resultado, '123XXXXXX01');
       });
 
@@ -301,8 +308,12 @@ void main() {
       });
 
       test('deve mascarar email', () {
-        final resultado = StringUtils.mascarar('usuario@email.com', inicioVisivel: 2, fimVisivel: 4);
-        expect(resultado, 'us*********com');
+        final resultado = StringUtils.mascarar(
+          'usuario@email.com',
+          inicioVisivel: 2,
+          fimVisivel: 4,
+        );
+        expect(resultado, 'us***********.com');
       });
     });
 
@@ -345,10 +356,13 @@ void main() {
         expect(resultado, 1.0);
       });
 
-      test('deve calcular similaridade zero para strings completamente diferentes', () {
-        final resultado = StringUtils.calcularSimilaridade('abc', 'xyz');
-        expect(resultado, 0.0);
-      });
+      test(
+        'deve calcular similaridade zero para strings completamente diferentes',
+        () {
+          final resultado = StringUtils.calcularSimilaridade('abc', 'xyz');
+          expect(resultado, 0.0);
+        },
+      );
 
       test('deve calcular similaridade parcial', () {
         final resultado = StringUtils.calcularSimilaridade('teste', 'testa');
@@ -378,7 +392,9 @@ void main() {
       });
 
       test('deve formatar gigabytes', () {
-        final resultado = StringUtils.formatarTamanhoBytes(1610612736); // 1.5 GB
+        final resultado = StringUtils.formatarTamanhoBytes(
+          1610612736,
+        ); // 1.5 GB
         expect(resultado, '1.5 GB');
       });
 
@@ -395,7 +411,11 @@ void main() {
       });
 
       test('deve gerar string apenas com letras minúsculas', () {
-        final resultado = StringUtils.gerarStringAleatoria(10, incluirNumeros: false, incluirMaiusculas: false);
+        final resultado = StringUtils.gerarStringAleatoria(
+          10,
+          incluirNumeros: false,
+          incluirMaiusculas: false,
+        );
         expect(resultado.length, 10);
         expect(RegExp(r'^[a-z]+$').hasMatch(resultado), true);
       });

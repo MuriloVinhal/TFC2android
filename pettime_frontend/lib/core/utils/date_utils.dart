@@ -1,29 +1,28 @@
 class DateUtils {
-  
   /// Formata uma data para o padrão brasileiro dd/MM/yyyy
   static String formatarDataBR(DateTime data) {
     return '${data.day.toString().padLeft(2, '0')}/'
-           '${data.month.toString().padLeft(2, '0')}/'
-           '${data.year}';
+        '${data.month.toString().padLeft(2, '0')}/'
+        '${data.year}';
   }
 
   /// Formata uma data e hora para o padrão brasileiro dd/MM/yyyy HH:mm
   static String formatarDataHoraBR(DateTime dataHora) {
     return '${formatarDataBR(dataHora)} '
-           '${dataHora.hour.toString().padLeft(2, '0')}:'
-           '${dataHora.minute.toString().padLeft(2, '0')}';
+        '${dataHora.hour.toString().padLeft(2, '0')}:'
+        '${dataHora.minute.toString().padLeft(2, '0')}';
   }
 
   /// Calcula a idade em anos a partir da data de nascimento
   static int calcularIdade(DateTime dataNascimento) {
     final hoje = DateTime.now();
     int idade = hoje.year - dataNascimento.year;
-    
+
     if (hoje.month < dataNascimento.month ||
         (hoje.month == dataNascimento.month && hoje.day < dataNascimento.day)) {
       idade--;
     }
-    
+
     return idade < 0 ? 0 : idade;
   }
 
@@ -41,24 +40,24 @@ class DateUtils {
   static bool isHoje(DateTime data) {
     final hoje = DateTime.now();
     return data.year == hoje.year &&
-           data.month == hoje.month &&
-           data.day == hoje.day;
+        data.month == hoje.month &&
+        data.day == hoje.day;
   }
 
   /// Verifica se uma data é amanhã
   static bool isAmanha(DateTime data) {
     final amanha = DateTime.now().add(Duration(days: 1));
     return data.year == amanha.year &&
-           data.month == amanha.month &&
-           data.day == amanha.day;
+        data.month == amanha.month &&
+        data.day == amanha.day;
   }
 
   /// Verifica se uma data é ontem
   static bool isOntem(DateTime data) {
     final ontem = DateTime.now().subtract(Duration(days: 1));
     return data.year == ontem.year &&
-           data.month == ontem.month &&
-           data.day == ontem.day;
+        data.month == ontem.month &&
+        data.day == ontem.day;
   }
 
   /// Verifica se uma data está nesta semana
@@ -66,9 +65,9 @@ class DateUtils {
     final agora = DateTime.now();
     final inicioSemana = agora.subtract(Duration(days: agora.weekday - 1));
     final fimSemana = inicioSemana.add(Duration(days: 6));
-    
+
     return data.isAfter(inicioSemana.subtract(Duration(days: 1))) &&
-           data.isBefore(fimSemana.add(Duration(days: 1)));
+        data.isBefore(fimSemana.add(Duration(days: 1)));
   }
 
   /// Verifica se uma data está neste mês
@@ -86,20 +85,37 @@ class DateUtils {
   /// Retorna o nome do mês em português
   static String getNomeMes(int mes) {
     const meses = [
-      '', 'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+      '',
+      'Janeiro',
+      'Fevereiro',
+      'Março',
+      'Abril',
+      'Maio',
+      'Junho',
+      'Julho',
+      'Agosto',
+      'Setembro',
+      'Outubro',
+      'Novembro',
+      'Dezembro',
     ];
-    
+
     return mes >= 1 && mes <= 12 ? meses[mes] : '';
   }
 
   /// Retorna o nome do dia da semana em português
   static String getNomeDiaSemana(int diaSemana) {
     const dias = [
-      '', 'Segunda-feira', 'Terça-feira', 'Quarta-feira',
-      'Quinta-feira', 'Sexta-feira', 'Sábado', 'Domingo'
+      '',
+      'Segunda-feira',
+      'Terça-feira',
+      'Quarta-feira',
+      'Quinta-feira',
+      'Sexta-feira',
+      'Sábado',
+      'Domingo',
     ];
-    
+
     return diaSemana >= 1 && diaSemana <= 7 ? dias[diaSemana] : '';
   }
 
@@ -133,16 +149,16 @@ class DateUtils {
   static DateTime adicionarDiasUteis(DateTime data, int dias) {
     DateTime resultado = data;
     int diasAdicionados = 0;
-    
+
     while (diasAdicionados < dias) {
       resultado = resultado.add(Duration(days: 1));
-      
+
       // Verifica se não é fim de semana (sábado = 6, domingo = 7)
       if (resultado.weekday < 6) {
         diasAdicionados++;
       }
     }
-    
+
     return resultado;
   }
 
@@ -150,14 +166,15 @@ class DateUtils {
   static int contarDiasUteis(DateTime dataInicial, DateTime dataFinal) {
     int diasUteis = 0;
     DateTime data = dataInicial;
-    
+
     while (data.isBefore(dataFinal) || data.isAtSameMomentAs(dataFinal)) {
-      if (data.weekday < 6) { // Segunda a sexta
+      if (data.weekday < 6) {
+        // Segunda a sexta
         diasUteis++;
       }
       data = data.add(Duration(days: 1));
     }
-    
+
     return diasUteis;
   }
 
@@ -175,13 +192,13 @@ class DateUtils {
   static String getDescricaoRelativa(DateTime data) {
     final agora = DateTime.now();
     final diferenca = data.difference(agora);
-    
+
     if (isHoje(data)) return 'Hoje';
     if (isOntem(data)) return 'Ontem';
     if (isAmanha(data)) return 'Amanhã';
-    
+
     final dias = diferenca.inDays;
-    
+
     if (dias > 0) {
       if (dias == 1) return 'Amanhã';
       if (dias < 7) return 'Em $dias dias';
@@ -217,11 +234,19 @@ class DateUtils {
     try {
       final parts = dataStr.split('/');
       if (parts.length != 3) return null;
-      
+
       final dia = int.parse(parts[0]);
       final mes = int.parse(parts[1]);
       final ano = int.parse(parts[2]);
+
+      // Validações básicas
+      if (dia < 1 || dia > 31) return null;
+      if (mes < 1 || mes > 12) return null;
+      if (ano < 1900 || ano > 2100) return null;
       
+      // Valida datas impossíveis como 32/07/2023
+      if (dia > getDiasNoMes(ano, mes)) return null;
+
       return DateTime(ano, mes, dia);
     } catch (e) {
       return null;
