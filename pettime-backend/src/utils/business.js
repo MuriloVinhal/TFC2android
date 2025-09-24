@@ -52,25 +52,26 @@ function validarAgendamento(agendamento) {
   const erros = [];
   
   // Validar data
-  const dataAgendamento = new Date(agendamento.data);
+  const dataAgendamento = new Date(agendamento.data + 'T00:00:00');
   const hoje = new Date();
   hoje.setHours(0, 0, 0, 0);
   
-  if (dataAgendamento < hoje) {
-    erros.push('Data não pode ser no passado');
-  }
-  
-  // Validar dia da semana (não funciona domingo)
+  // Validar dia da semana primeiro (não funciona domingo)
   const diaSemana = dataAgendamento.getDay();
   if (diaSemana === 0) { // Domingo
     erros.push('Não funcionamos aos domingos');
+  }
+  
+  // Só valida data passada se não for domingo
+  if (dataAgendamento < hoje) {
+    erros.push('Data não pode ser no passado');
   }
   
   // Validar horário comercial (8h às 18h)
   const [hora, minuto] = agendamento.horario.split(':').map(Number);
   const horarioMinutos = hora * 60 + minuto;
   
-  if (horarioMinutos < 8 * 60 || horarioMinutos > 18 * 60) {
+  if (horarioMinutos < 8 * 60 || horarioMinutos >= 18 * 60) {
     erros.push('Horário fora do funcionamento');
   }
   

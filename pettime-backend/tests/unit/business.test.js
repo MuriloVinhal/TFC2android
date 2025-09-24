@@ -63,8 +63,11 @@ describe('Regras de Negócio - Testes Unitários', () => {
 
   describe('Validação de Agendamento', () => {
     test('deve validar agendamento em horário comercial', () => {
+      const amanha = new Date();
+      amanha.setDate(amanha.getDate() + 1);
+      
       const agendamento = {
-        data: '2025-09-24',
+        data: amanha.toISOString().split('T')[0],
         horario: '14:00',
         servicoId: 1,
         petId: 1
@@ -76,8 +79,11 @@ describe('Regras de Negócio - Testes Unitários', () => {
     });
 
     test('deve invalidar agendamento fora do horário comercial', () => {
+      const amanha = new Date();
+      amanha.setDate(amanha.getDate() + 1);
+      
       const agendamento = {
-        data: '2025-09-24',
+        data: amanha.toISOString().split('T')[0],
         horario: '07:00', // Antes das 8h
         servicoId: 1,
         petId: 1

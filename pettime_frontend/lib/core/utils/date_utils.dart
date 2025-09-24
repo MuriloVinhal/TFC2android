@@ -243,7 +243,7 @@ class DateUtils {
       if (dia < 1 || dia > 31) return null;
       if (mes < 1 || mes > 12) return null;
       if (ano < 1900 || ano > 2100) return null;
-      
+
       // Valida datas impossíveis como 32/07/2023
       if (dia > getDiasNoMes(ano, mes)) return null;
 

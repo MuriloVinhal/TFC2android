@@ -62,8 +62,8 @@ describe('Validadores - Testes Unitários', () => {
       const telefonesInvalidos = [
         '123456789',         // Muito curto
         '123456789012',      // Muito longo
-        '00987654321',       // DDD inválido
-        '1234567890',        // DDD inválido (12 não existe)
+        '00987654321',       // DDD inválido (00)
+        '0934567890',        // DDD inválido (09 não existe)
         'abcdefghijk',       // Não numérico
         '1198765432',        // Celular sem 9 no terceiro dígito
         ''

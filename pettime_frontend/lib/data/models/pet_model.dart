@@ -41,10 +41,10 @@ class Pet {
     if (dataNascimento == null) return 0;
 
     final agora = DateTime.now();
-    
+
     // Verifica se a data é no futuro
     if (dataNascimento!.isAfter(agora)) return 0;
-    
+
     int idade = agora.year - dataNascimento!.year;
 
     if (agora.month < dataNascimento!.month ||
@@ -61,10 +61,10 @@ class Pet {
     if (dataNascimento == null) return 0;
 
     final agora = DateTime.now();
-    
+
     // Verifica se a data é no futuro
     if (dataNascimento!.isAfter(agora)) return 0;
-    
+
     int meses =
         (agora.year - dataNascimento!.year) * 12 +
         agora.month -
@@ -181,7 +181,9 @@ class Pet {
       nome: nome ?? this.nome,
       especie: especie ?? this.especie,
       raca: raca ?? this.raca,
-      dataNascimento: clearDataNascimento ? null : (dataNascimento ?? this.dataNascimento),
+      dataNascimento: clearDataNascimento
+          ? null
+          : (dataNascimento ?? this.dataNascimento),
       cor: cor ?? this.cor,
       peso: clearPeso ? null : (peso ?? this.peso),
       observacoes: observacoes ?? this.observacoes,
