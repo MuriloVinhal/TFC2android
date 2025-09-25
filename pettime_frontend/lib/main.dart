@@ -18,7 +18,7 @@ import 'modules/home/notifications_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   try {
     // Inicializar Firebase com configuração manual
     await Firebase.initializeApp(
@@ -31,15 +31,14 @@ void main() async {
       ),
     );
     print('✅ Firebase inicializado com sucesso');
-    
+
     // Inicializar serviço de notificações push
     await PushService.init();
     print('✅ PushService inicializado com sucesso');
-    
   } catch (e) {
     print('❌ Erro ao inicializar Firebase: $e');
   }
-  
+
   runApp(PettimeApp());
 }
 

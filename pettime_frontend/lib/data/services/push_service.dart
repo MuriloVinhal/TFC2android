@@ -7,7 +7,7 @@ import '../../core/utils/api_config.dart';
 // Função para lidar com mensagens em background
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("Mensagem recebida em background: ${message.messageId}");
-  
+
   // Mostrar notificação local se não há payload de notificação
   if (message.notification == null) {
     await PushService._showLocalNotification(message);
@@ -15,8 +15,10 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 class PushService {
-  static final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
-  static final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
+  static final FirebaseMessaging _firebaseMessaging =
+      FirebaseMessaging.instance;
+  static final FlutterLocalNotificationsPlugin _localNotifications =
+      FlutterLocalNotificationsPlugin();
   static bool _initialized = false;
   static String? _fcmToken;
 
@@ -26,15 +28,18 @@ class PushService {
 
     try {
       // Configurar handler para mensagens em background
-      FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+      FirebaseMessaging.onBackgroundMessage(
+        _firebaseMessagingBackgroundHandler,
+      );
 
       // Solicitar permissões
-      NotificationSettings settings = await _firebaseMessaging.requestPermission(
-        alert: true,
-        badge: true,
-        sound: true,
-        provisional: false,
-      );
+      NotificationSettings settings = await _firebaseMessaging
+          .requestPermission(
+            alert: true,
+            badge: true,
+            sound: true,
+            provisional: false,
+          );
 
       if (settings.authorizationStatus == AuthorizationStatus.authorized) {
         print('Permissões de notificação concedidas');
@@ -55,7 +60,6 @@ class PushService {
 
       _initialized = true;
       print('Serviço de notificações push inicializado com sucesso');
-
     } catch (e) {
       print('Erro ao inicializar notificações push: $e');
     }
@@ -68,15 +72,16 @@ class PushService {
 
     const DarwinInitializationSettings initializationSettingsiOS =
         DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
-    );
+          requestAlertPermission: true,
+          requestBadgePermission: true,
+          requestSoundPermission: true,
+        );
 
-    const InitializationSettings initializationSettings = InitializationSettings(
-      android: initializationSettingsAndroid,
-      iOS: initializationSettingsiOS,
-    );
+    const InitializationSettings initializationSettings =
+        InitializationSettings(
+          android: initializationSettingsAndroid,
+          iOS: initializationSettingsiOS,
+        );
 
     await _localNotifications.initialize(
       initializationSettings,
@@ -92,7 +97,9 @@ class PushService {
     );
 
     await _localNotifications
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.createNotificationChannel(channel);
   }
 
@@ -111,7 +118,9 @@ class PushService {
     });
 
     // Verificar se o app foi iniciado por uma notificação
-    FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
+    FirebaseMessaging.instance.getInitialMessage().then((
+      RemoteMessage? message,
+    ) {
       if (message != null) {
         print('App iniciado via notificação: ${message.messageId}');
         _handleNotificationTap(message.data);
@@ -123,20 +132,20 @@ class PushService {
   static Future<void> _showLocalNotification(RemoteMessage message) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
-      'pettime_channel',
-      'PetTime Notificações',
-      channelDescription: 'Canal para notificações do PetTime',
-      importance: Importance.high,
-      priority: Priority.high,
-      showWhen: true,
-    );
+          'pettime_channel',
+          'PetTime Notificações',
+          channelDescription: 'Canal para notificações do PetTime',
+          importance: Importance.high,
+          priority: Priority.high,
+          showWhen: true,
+        );
 
     const DarwinNotificationDetails iOSPlatformChannelSpecifics =
         DarwinNotificationDetails(
-      presentAlert: true,
-      presentBadge: true,
-      presentSound: true,
-    );
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        );
 
     const NotificationDetails platformChannelSpecifics = NotificationDetails(
       android: androidPlatformChannelSpecifics,
@@ -167,11 +176,11 @@ class PushService {
   /// Lida com o toque em uma notificação
   static void _handleNotificationTap(Map<String, dynamic> data) {
     print('Notificação tocada com dados: $data');
-    
+
     // TODO: Implementar navegação específica baseada no tipo de notificação
     final tipo = data['tipo'];
     final agendamentoId = data['agendamentoId'];
-    
+
     switch (tipo) {
       case 'agendamento_confirmado':
       case 'agendamento_cancelado':
@@ -198,13 +207,8 @@ class PushService {
       // Usar a configuração de API do projeto
       final response = await http.post(
         Uri.parse('${ApiConfig.baseUrl}/api/notifications/token'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'token': _fcmToken,
-          'userId': userId,
-        }),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'token': _fcmToken, 'userId': userId}),
       );
 
       if (response.statusCode == 200) {
@@ -256,20 +260,20 @@ class LocalNotificationService {
     // Usar o serviço de notificações locais do PushService
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
-      'pettime_channel',
-      'PetTime Notificações',
-      channelDescription: 'Canal para notificações do PetTime',
-      importance: Importance.high,
-      priority: Priority.high,
-      showWhen: true,
-    );
+          'pettime_channel',
+          'PetTime Notificações',
+          channelDescription: 'Canal para notificações do PetTime',
+          importance: Importance.high,
+          priority: Priority.high,
+          showWhen: true,
+        );
 
     const DarwinNotificationDetails iOSPlatformChannelSpecifics =
         DarwinNotificationDetails(
-      presentAlert: true,
-      presentBadge: true,
-      presentSound: true,
-    );
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        );
 
     const NotificationDetails platformChannelSpecifics = NotificationDetails(
       android: androidPlatformChannelSpecifics,
@@ -295,7 +299,7 @@ class LocalNotificationService {
     // Para notificações agendadas, você pode usar o flutter_local_notifications
     // ou implementar um sistema no backend que envia a notificação no momento certo
     print('Agendamento de notificação para $scheduledDate: $title - $body');
-    
+
     // TODO: Implementar agendamento real ou enviar para o backend
   }
 
