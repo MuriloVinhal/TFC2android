@@ -54,8 +54,8 @@ class _LoginPageState extends State<LoginPage> {
         print('Token salvo no SharedPreferences: $tokenLimpo'); // DEBUG
         await prefs.setInt('usuarioId', usuarioId);
 
-        // Enviar deviceToken ao backend (FCM)
-        await PushService.sendDeviceTokenToBackend();
+        // Enviar token FCM ao backend para notificações push
+        await PushService.sendTokenToBackend(usuarioId.toString());
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Bem-vindo, $nome! Tipo: $tipo')),

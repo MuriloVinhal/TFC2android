@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'modules/auth/login_page.dart';
 import 'modules/auth/register_page.dart';
 import 'modules/auth/forget_password.dart'; // Importe a página de redefinição de senha
@@ -17,7 +18,28 @@ import 'modules/home/notifications_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await PushService.init();
+  
+  try {
+    // Inicializar Firebase com configuração manual
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+        apiKey: 'AIzaSyB0z0bYe89X0icmIBTlqNaT5iU0pErbzQI',
+        appId: '1:848570619638:android:1cbb6babddd990b1c83ed7',
+        messagingSenderId: '848570619638',
+        projectId: 'pettime-f6c68',
+        storageBucket: 'pettime-f6c68.firebasestorage.app',
+      ),
+    );
+    print('✅ Firebase inicializado com sucesso');
+    
+    // Inicializar serviço de notificações push
+    await PushService.init();
+    print('✅ PushService inicializado com sucesso');
+    
+  } catch (e) {
+    print('❌ Erro ao inicializar Firebase: $e');
+  }
+  
   runApp(PettimeApp());
 }
 

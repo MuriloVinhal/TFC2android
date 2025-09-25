@@ -29,12 +29,14 @@ const servicoAdicionalRoutes = require('./routes/servicoadicionalRoutes');
 const produtoRoutes = require('./routes/produtoRoutes');
 const agendamentosRouter = require('./routes/agendamentos');
 const notificacaoRoutes = require('./routes/notificacaoRoutes');
+const pushNotificationRoutes = require('./routes/notifications');
 
 app.use('/tosas', tosaRoutes);
 app.use('/servicos-adicionais', servicoAdicionalRoutes);
 app.use('/produtos', produtoRoutes);
 app.use('/agendamentos', agendamentosRouter);
 app.use('/notificacoes', notificacaoRoutes);
+app.use('/api/notifications', pushNotificationRoutes);
 
 app.use('/uploads', express.static('uploads'));
 
