@@ -9,25 +9,26 @@ class AdminHomePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
+        backgroundColor: Colors.blue,
+        elevation: 4,
+        shadowColor: Colors.blue.shade200,
         centerTitle: true,
         title: const Text(
-          'PetTime',
+          'PetTime - Admin',
           style: TextStyle(
-            fontSize: 32,
+            fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: Colors.black,
+            color: Colors.white,
           ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout, color: Colors.black, size: 28),
+            icon: const Icon(Icons.logout, color: Colors.white, size: 28),
             tooltip: 'Sair',
             onPressed: () async {
               final prefs = await SharedPreferences.getInstance();
-              await prefs.remove('token');
-              await prefs.remove('usuarioId');
+              await prefs.remove('jwt_token');
+              await prefs.remove('user_id');
               Navigator.pushNamedAndRemoveUntil(
                 context,
                 '/login',

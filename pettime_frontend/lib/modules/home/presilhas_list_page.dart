@@ -90,13 +90,15 @@ class _PresilhasListPageState extends State<PresilhasListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
+        backgroundColor: Colors.blue,
+        elevation: 4,
+        shadowColor: Colors.blue.shade200,
         centerTitle: true,
+        foregroundColor: Colors.white,
         title: const Text(
           'Presilhas',
           style: TextStyle(
-            color: Colors.black,
+            color: Colors.white,
             fontWeight: FontWeight.bold,
             fontSize: 20,
           ),
@@ -112,6 +114,7 @@ class _PresilhasListPageState extends State<PresilhasListPage> {
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),

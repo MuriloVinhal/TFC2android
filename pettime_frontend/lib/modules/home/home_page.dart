@@ -6,8 +6,6 @@ import 'edit_pet_page.dart';
 import '../../core/utils/api_config.dart';
 import 'agendamento_page.dart';
 import 'historico_agendamentos_page.dart';
-import 'notificacoes_page.dart';
-import '../../shared/widgets/notification_badge.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -17,7 +15,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<Map<String, dynamic>> pets = [];
   bool carregando = true;
-  int _notifTick = 0;
 
   @override
   void initState() {
@@ -27,22 +24,38 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _carregarPets() async {
     setState(() => carregando = true);
-    final prefs = await SharedPreferences.getInstance();
-    final usuarioId = prefs.getInt('usuarioId');
-    if (usuarioId == null) return;
-    final response = await http.get(
-      Uri.parse('${ApiConfig.baseUrl}/pets?usuarioId=$usuarioId'),
-    );
-    if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body);
-      setState(() {
-        pets = data
-            .cast<Map<String, dynamic>>()
-            .where((pet) => pet['deletado'] != true)
-            .toList();
-        carregando = false;
-      });
-    } else {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final usuarioId = prefs.getInt('user_id'); // Corrigido para user_id
+      
+      if (usuarioId == null) {
+        print('❌ usuarioId não encontrado no SharedPreferences');
+        setState(() => carregando = false);
+        return;
+      }
+      
+      print('📱 Carregando pets para usuário: $usuarioId');
+      final response = await http.get(
+        Uri.parse('${ApiConfig.baseUrl}/pets?usuarioId=$usuarioId'),
+      );
+      
+      print('📱 Status response: ${response.statusCode}');
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        setState(() {
+          pets = data
+              .cast<Map<String, dynamic>>()
+              .where((pet) => pet['deletado'] != true)
+              .toList();
+          carregando = false;
+        });
+        print('✅ ${pets.length} pets carregados');
+      } else {
+        print('❌ Erro ao carregar pets: ${response.statusCode}');
+        setState(() => carregando = false);
+      }
+    } catch (e) {
+      print('❌ Erro de conexão ao carregar pets: $e');
       setState(() => carregando = false);
     }
   }
@@ -96,42 +109,32 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('PetTime', style: TextStyle(fontWeight: FontWeight.bold)),
-        actions: [
-          NotificationBadge(
-            refreshTick: _notifTick,
-            onTap: () async {
-              await Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => NotificacoesPage()),
-              );
-              if (mounted) setState(() => _notifTick++);
-            },
-            child: IconButton(
-              icon: Icon(Icons.notifications, size: 28),
-              tooltip: 'Notificações',
-              onPressed: () async {
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => NotificacoesPage()),
-                );
-                if (mounted) setState(() => _notifTick++);
-              },
-            ),
+        title: Text(
+          'PetTime', 
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
+            color: Colors.white,
           ),
+        ),
+        backgroundColor: Colors.blue,
+        elevation: 4,
+        shadowColor: Colors.blue.shade200,
+        actions: [
           IconButton(
-            icon: Icon(Icons.account_circle_rounded, size: 30),
+            icon: Icon(Icons.account_circle_rounded, size: 30, color: Colors.white),
+            tooltip: 'Perfil',
             onPressed: () {
               Navigator.pushNamed(context, '/profile');
             },
           ),
           IconButton(
-            icon: Icon(Icons.logout, size: 28),
+            icon: Icon(Icons.logout, size: 28, color: Colors.white),
             tooltip: 'Sair',
             onPressed: () async {
               final prefs = await SharedPreferences.getInstance();
-              await prefs.remove('token');
-              await prefs.remove('usuarioId');
+              await prefs.remove('jwt_token');
+              await prefs.remove('user_id');
               Navigator.pushNamedAndRemoveUntil(
                 context,
                 '/login',
@@ -149,21 +152,46 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(12),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.blue.shade50,
+                          Colors.white,
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.shade200,
+                          blurRadius: 8,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
                     ),
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(16),
                     child: Column(
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
-                              'Seus Pets',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.pets_rounded, 
+                                  color: Colors.blue,
+                                  size: 24,
+                                ),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Seus Pets',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.blue.shade700,
+                                  ),
+                                ),
+                              ],
                             ),
                             ElevatedButton.icon(
                               onPressed: () {
@@ -175,71 +203,135 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                 );
                               },
-                              icon: Icon(Icons.history),
+                              icon: Icon(Icons.history_rounded, size: 18),
                               label: Text('Histórico'),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blue,
                                 foregroundColor: Colors.white,
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 8,
+                                  horizontal: 16,
+                                  vertical: 10,
                                 ),
-                                textStyle: const TextStyle(fontSize: 14),
+                                textStyle: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 2,
                               ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 12),
                         pets.isEmpty
-                            ? const Text('Nenhum pet cadastrado.')
+                            ? Container(
+                                padding: EdgeInsets.all(24),
+                                child: Column(
+                                  children: [
+                                    Icon(
+                                      Icons.pets_outlined,
+                                      size: 48,
+                                      color: Colors.grey.shade400,
+                                    ),
+                                    SizedBox(height: 12),
+                                    Text(
+                                      'Nenhum pet cadastrado.',
+                                      style: TextStyle(
+                                        color: Colors.grey.shade600,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
                             : ListView.separated(
                                 shrinkWrap: true,
                                 physics: NeverScrollableScrollPhysics(),
                                 itemCount: pets.length,
-                                separatorBuilder: (_, __) => Divider(),
+                                separatorBuilder: (_, __) => SizedBox(height: 8),
                                 itemBuilder: (context, index) {
                                   final pet = pets[index];
-                                  return ListTile(
-                                    leading: CircleAvatar(
-                                      backgroundColor: Colors.blue.shade50,
-                                      backgroundImage:
-                                          (pet['foto'] != null &&
-                                              pet['foto'].toString().isNotEmpty)
-                                          ? NetworkImage(
-                                              '${ApiConfig.baseUrl}${pet['foto']}',
-                                            )
-                                          : null,
-                                      child:
-                                          (pet['foto'] == null ||
-                                              pet['foto'].toString().isEmpty)
-                                          ? Icon(
-                                              Icons.pets,
-                                              color: Colors.black,
-                                            )
-                                          : null,
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: Colors.grey.shade200,
+                                        width: 1,
+                                      ),
                                     ),
-                                    title: Text(pet['nome'] ?? ''),
-                                    subtitle: Text(
-                                      'Raça: ${pet['raca'] ?? ''}',
-                                    ),
-                                    trailing: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        IconButton(
-                                          icon: Icon(
-                                            Icons.edit,
-                                            color: Colors.blue,
-                                          ),
-                                          onPressed: () => _abrirEdicaoPet(pet),
+                                    child: ListTile(
+                                      contentPadding: EdgeInsets.all(12),
+                                      leading: CircleAvatar(
+                                        radius: 28,
+                                        backgroundColor: Colors.blue.shade50,
+                                        backgroundImage:
+                                            (pet['foto'] != null &&
+                                                pet['foto'].toString().isNotEmpty)
+                                            ? NetworkImage(
+                                                '${ApiConfig.baseUrl}${pet['foto']}',
+                                              )
+                                            : null,
+                                        child:
+                                            (pet['foto'] == null ||
+                                                pet['foto'].toString().isEmpty)
+                                            ? Icon(
+                                                Icons.pets_rounded,
+                                                color: Colors.blue,
+                                                size: 28,
+                                              )
+                                            : null,
+                                      ),
+                                      title: Text(
+                                        pet['nome'] ?? '',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 16,
                                         ),
-                                        IconButton(
-                                          icon: Icon(
-                                            Icons.delete,
-                                            color: Colors.red,
-                                          ),
-                                          onPressed: () => _excluirPet(pet),
+                                      ),
+                                      subtitle: Text(
+                                        'Raça: ${pet['raca'] ?? ''}',
+                                        style: TextStyle(
+                                          color: Colors.grey.shade600,
                                         ),
-                                      ],
+                                      ),
+                                      trailing: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              color: Colors.blue.shade50,
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            child: IconButton(
+                                              icon: Icon(
+                                                Icons.edit_rounded,
+                                                color: Colors.blue.shade600,
+                                                size: 20,
+                                              ),
+                                              onPressed: () => _abrirEdicaoPet(pet),
+                                            ),
+                                          ),
+                                          SizedBox(width: 8),
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              color: Colors.red.shade50,
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            child: IconButton(
+                                              icon: Icon(
+                                                Icons.delete_rounded,
+                                                color: Colors.red.shade600,
+                                                size: 20,
+                                              ),
+                                              onPressed: () => _excluirPet(pet),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   );
                                 },
@@ -252,31 +344,55 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
             ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add_circle_outline),
-            label: '',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.pets), label: ''),
-        ],
-        onTap: (index) async {
-          if (index == 1) {
-            await Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => AgendamentoPage()),
-            );
-          } else if (index == 2) {
-            final cadastrado = await Navigator.pushNamed(
-              context,
-              '/register-pet',
-            );
-            if (cadastrado == true) {
-              _carregarPets();
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.shade300,
+              blurRadius: 10,
+              offset: Offset(0, -2),
+            ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          backgroundColor: Colors.white,
+          selectedItemColor: Colors.blue,
+          unselectedItemColor: Colors.grey.shade500,
+          selectedFontSize: 12,
+          unselectedFontSize: 12,
+          type: BottomNavigationBarType.fixed,
+          elevation: 0,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_rounded, size: 26),
+              label: 'Início',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.calendar_today_rounded, size: 24),
+              label: 'Agendar',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.pets_rounded, size: 26),
+              label: 'Novo Pet',
+            ),
+          ],
+          onTap: (index) async {
+            if (index == 1) {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AgendamentoPage()),
+              );
+            } else if (index == 2) {
+              final cadastrado = await Navigator.pushNamed(
+                context,
+                '/register-pet',
+              );
+              if (cadastrado == true) {
+                _carregarPets();
+              }
             }
-          }
-        },
+          },
+        ),
       ),
     );
   }

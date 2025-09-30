@@ -698,16 +698,20 @@ class _AdminAgendamentosPageState extends State<AdminAgendamentosPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Agendamentos',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          'Agendamentos - Admin',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
         centerTitle: true,
-        elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        elevation: 4,
+        shadowColor: Colors.blue.shade200,
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
         actions: [
           IconButton(
-            icon: Icon(Icons.refresh),
+            icon: Icon(Icons.refresh, color: Colors.white),
             onPressed: _carregarAgendamentos,
           ),
         ],

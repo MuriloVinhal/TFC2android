@@ -37,9 +37,8 @@ class _LoginPageState extends State<LoginPage> {
       setState(() => carregando = false);
       if (resposta.statusCode == 200) {
         final dados = jsonDecode(resposta.body);
-        final nome = dados['usuario']['nome'];
         final tipo = dados['usuario']['tipo'];
-        final token = dados['token'];
+        final token = dados['token'].toString(); // Converter para String
         print('Token recebido do backend: $token'); // DEBUG
         final usuarioId = dados['usuario']['id'];
 
@@ -48,45 +47,28 @@ class _LoginPageState extends State<LoginPage> {
         final tokenLimpo = token
             .replaceAll('\n', '')
             .replaceAll('\r', '')
-            .replaceAll(' ', '')
-            .trim();
-        await prefs.setString('token', tokenLimpo);
+            .replaceAll(' ', '');
+        await prefs.setString('jwt_token', tokenLimpo);
+        await prefs.setInt('user_id', usuarioId);
         print('Token salvo no SharedPreferences: $tokenLimpo'); // DEBUG
-        await prefs.setInt('usuarioId', usuarioId);
 
-        // Enviar token FCM ao backend para notificações push
+        // Enviar token FCM para o backend (converter usuarioId para String)
         await PushService.sendTokenToBackend(usuarioId.toString());
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Bem-vindo, $nome! Tipo: $tipo')),
-        );
-
-        // Redirecionar para a Home
+        // Redirecionar baseado no tipo de usuário
         if (tipo == 'admin') {
           Navigator.pushReplacementNamed(context, '/admin-home');
         } else {
           Navigator.pushReplacementNamed(context, '/home');
         }
       } else {
-        String mensagemErro =
-            'Erro ao fazer login. Código: ${resposta.statusCode}';
-        try {
-          final body = jsonDecode(resposta.body);
-          if (body['erro'] != null &&
-              body['erro'].toString().contains('excluído')) {
-            mensagemErro =
-                'Seu cadastro foi excluído e não é possível acessar o sistema com esses dados.';
-          } else if (body['erro'] != null) {
-            mensagemErro = body['erro'];
-          }
-        } catch (_) {}
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(mensagemErro)));
+        final erro = jsonDecode(resposta.body);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(erro['error'] ?? 'Erro desconhecido')),
+        );
       }
     } catch (e) {
       setState(() => carregando = false);
-      print('Erro de conexão: $e');
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Erro de conexão: $e')));
@@ -97,121 +79,128 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            children: [
-              // Logo e título
-              Expanded(
-                flex: 2,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'PetTime',
-                      style: TextStyle(
-                        fontSize: 48,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height - 
+                   MediaQuery.of(context).padding.top - 
+                   MediaQuery.of(context).padding.bottom,
+            child: Column(
+              children: [
+                // Logo e título
+                Expanded(
+                  flex: 2,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'PetTime',
+                        style: TextStyle(
+                          fontSize: 48,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Bem vindo!',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textSecondary,
+                      const SizedBox(height: 16),
+                      const Text(
+                        'Bem vindo!',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textSecondary,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
 
-              // Formulário de login
-              Expanded(
-                flex: 3,
-                child: Column(
-                  children: [
-                    // Campo de email
-                    CustomTextField(
-                      controller: emailController,
-                      hintText: 'Email',
-                      keyboardType: TextInputType.emailAddress,
-                      prefixIcon: Icons.email_outlined,
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Campo de senha
-                    CustomTextField(
-                      controller: senhaController,
-                      hintText: 'Senha',
-                      obscureText: true,
-                      prefixIcon: Icons.lock_outlined,
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    // Link "Esqueceu a senha?"
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: TextButton(
-                        onPressed: () {
-                          Navigator.pushNamed(context, '/forget-password');
-                        },
-                        child: const Text(
-                          'Esqueceu a senha?',
-                          style: TextStyle(
-                            color: AppColors.primary,
-                            fontSize: 14,
-                          ),
-                        ),
+                // Formulário de login
+                Expanded(
+                  flex: 3,
+                  child: Column(
+                    children: [
+                      // Campo de email
+                      CustomTextField(
+                        controller: emailController,
+                        hintText: 'Email',
+                        keyboardType: TextInputType.emailAddress,
+                        prefixIcon: Icons.email_outlined,
                       ),
-                    ),
 
-                    const SizedBox(height: 24),
+                      const SizedBox(height: 16),
 
-                    // Botão de login
-                    CustomButton(
-                      text: 'Login',
-                      onPressed: fazerLogin,
-                      isLoading: carregando,
-                    ),
+                      // Campo de senha
+                      CustomTextField(
+                        controller: senhaController,
+                        hintText: 'Senha',
+                        obscureText: true,
+                        prefixIcon: Icons.lock_outlined,
+                      ),
 
-                    const SizedBox(height: 24),
+                      const SizedBox(height: 8),
 
-                    // Link para registro
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text(
-                          'Não possui cadastro? ',
-                          style: TextStyle(
-                            color: AppColors.textSecondary,
-                            fontSize: 14,
-                          ),
-                        ),
-                        TextButton(
+                      // Link "Esqueceu a senha?"
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: TextButton(
                           onPressed: () {
-                            Navigator.pushNamed(context, '/register');
+                            Navigator.pushNamed(context, '/forget-password');
                           },
                           child: const Text(
-                            'Registre-se',
+                            'Esqueceu a senha?',
                             style: TextStyle(
                               color: AppColors.primary,
                               fontSize: 14,
-                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Botão de login
+                      CustomButton(
+                        text: 'Login',
+                        onPressed: fazerLogin,
+                        isLoading: carregando,
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Link para registro
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            'Não possui cadastro? ',
+                            style: TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 14,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pushNamed(context, '/register');
+                            },
+                            child: const Text(
+                              'Registre-se',
+                              style: TextStyle(
+                                color: AppColors.primary,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

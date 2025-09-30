@@ -104,13 +104,15 @@ class _PresilhasCadastroPageState extends State<PresilhasCadastroPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
+        backgroundColor: Colors.blue,
+        elevation: 4,
+        shadowColor: Colors.blue.shade200,
         centerTitle: true,
+        foregroundColor: Colors.white,
         title: Text(
           isEdit ? 'Editar presilha' : 'Cadastro de presilhas',
           style: const TextStyle(
-            color: Colors.black,
+            color: Colors.white,
             fontWeight: FontWeight.bold,
             fontSize: 20,
           ),
@@ -195,6 +197,7 @@ class _PresilhasCadastroPageState extends State<PresilhasCadastroPage> {
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),

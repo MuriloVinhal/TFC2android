@@ -469,15 +469,22 @@ class _AdminHistoricoPageState extends State<AdminHistoricoPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Histórico de Agendamentos',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          'Histórico - Admin',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
         centerTitle: true,
-        elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        elevation: 4,
+        shadowColor: Colors.blue.shade200,
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
         actions: [
-          IconButton(icon: Icon(Icons.refresh), onPressed: _carregarDados),
+          IconButton(
+            icon: Icon(Icons.refresh, color: Colors.white), 
+            onPressed: _carregarDados,
+          ),
         ],
       ),
       body: Column(
@@ -495,9 +502,15 @@ class _AdminHistoricoPageState extends State<AdminHistoricoPage> {
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     value: filtroStatus,
+                    dropdownColor: Colors.white,
+                    style: TextStyle(color: Colors.black),
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.blue, width: 2),
                       ),
                       contentPadding: EdgeInsets.symmetric(
                         horizontal: 12,

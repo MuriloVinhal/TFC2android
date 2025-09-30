@@ -3,7 +3,19 @@ const Pet = db.Pet;
 
 const createPet = async (petData) => {
     try {
-        const pet = await Pet.create(petData);
+        // Garantir que campos obrigatórios estejam presentes
+        const dadosLimpos = {
+            nome: petData.nome,
+            raca: petData.raca,
+            idade: petData.idade,
+            porte: petData.porte,
+            usuarioId: petData.usuarioId,
+            deletado: false,
+            // Foto é opcional - só incluir se fornecida
+            ...(petData.foto && { foto: petData.foto })
+        };
+        
+        const pet = await Pet.create(dadosLimpos);
         return pet;
     } catch (error) {
         throw new Error('Error creating pet: ' + error.message);

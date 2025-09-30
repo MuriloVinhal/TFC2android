@@ -3,17 +3,26 @@ const petService = require('../services/petService');
 const createPet = async (req, res) => {
     try {
         const petData = req.body;
+        
+        // Validações básicas
+        if (!petData.nome || !petData.raca || !petData.idade || !petData.porte || !petData.usuarioId) {
+            return res.status(400).json({ 
+                message: 'Campos obrigatórios: nome, raca, idade, porte, usuarioId' 
+            });
+        }
+        
+        // Foto é opcional - só adicionar se enviada
         if (req.file) {
-            // Salva o caminho relativo da imagem
             petData.foto = `/uploads/pets/${req.file.filename}`;
         }
+        
         const newPet = await petService.createPet(petData);
         res.status(201).json({
             message: 'Pet cadastrado com sucesso!',
-            pet: newPet,
-            foto: petData.foto
+            pet: newPet
         });
     } catch (error) {
+        console.error('Erro ao cadastrar pet:', error);
         res.status(500).json({ message: 'Erro ao cadastrar pet', error: error.message });
     }
 };

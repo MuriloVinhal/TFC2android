@@ -162,10 +162,17 @@ class _EditPetPageState extends State<EditPetPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Editar Pet'),
+        backgroundColor: Colors.blue,
+        elevation: 4,
+        shadowColor: Colors.blue.shade200,
+        foregroundColor: Colors.white,
+        title: const Text(
+          'Editar Pet',
+          style: TextStyle(color: Colors.white),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.delete, color: Colors.red),
+            icon: const Icon(Icons.delete, color: Colors.white),
             onPressed: _excluirPet,
             tooltip: 'Excluir',
           ),
@@ -207,17 +214,29 @@ class _EditPetPageState extends State<EditPetPage> {
                       value == null || value.isEmpty ? 'Informe a idade' : null,
                 ),
                 const SizedBox(height: 16),
-                TextFormField(
-                  initialValue: porte,
+                DropdownButtonFormField<String>(
+                  value: porte.isNotEmpty ? porte : null,
                   decoration: InputDecoration(
                     labelText: 'Porte',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(color: Colors.blue, width: 2),
+                    ),
                   ),
+                  dropdownColor: Colors.white,
+                  style: TextStyle(color: Colors.black),
+                  items: const [
+                    DropdownMenuItem(value: 'Pequeno', child: Text('Pequeno')),
+                    DropdownMenuItem(value: 'Médio', child: Text('Médio')),
+                    DropdownMenuItem(value: 'Grande', child: Text('Grande')),
+                  ],
+                  onChanged: (value) => setState(() => porte = value ?? ''),
                   onSaved: (value) => porte = value ?? '',
                   validator: (value) =>
-                      value == null || value.isEmpty ? 'Informe o porte' : null,
+                      value == null || value.isEmpty ? 'Selecione o porte' : null,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
@@ -286,6 +305,7 @@ class _EditPetPageState extends State<EditPetPage> {
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),

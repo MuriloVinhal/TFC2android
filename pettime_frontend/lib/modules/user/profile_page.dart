@@ -38,7 +38,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<Map<String, String>> _getHeaders() async {
     final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token')?.replaceAll('\n', '').trim();
+    final token = prefs.getString('jwt_token')?.replaceAll('\n', '').trim();
     print('Token carregado do SharedPreferences: $token'); // DEBUG
     return {
       'Content-Type': 'application/json',
@@ -245,12 +245,20 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Cadastro',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          'Perfil',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
-        elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        elevation: 4,
+        shadowColor: Colors.blue.shade200,
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),

@@ -84,30 +84,46 @@ class _HistoricoAgendamentosPageState extends State<HistoricoAgendamentosPage> {
 
   Future<void> _carregarHistorico() async {
     final prefs = await SharedPreferences.getInstance();
-    final usuarioId = prefs.getInt('usuarioId');
-    if (usuarioId == null) return;
+    final usuarioId = prefs.getInt('user_id'); // Corrigido para user_id
+    if (usuarioId == null) {
+      print('❌ usuarioId não encontrado no SharedPreferences');
+      return;
+    }
+    
+    print('📱 Carregando agendamentos para usuário: $usuarioId');
     final responsePets = await http.get(
       Uri.parse('${ApiConfig.baseUrl}/pets?usuarioId=$usuarioId'),
     );
+    
+    print('📱 Status response pets: ${responsePets.statusCode}');
     if (responsePets.statusCode == 200) {
       final List<dynamic> petsData = jsonDecode(responsePets.body);
       List<Map<String, dynamic>> ags = [];
       for (final pet in petsData) {
         final petId = pet['id'];
+        print('📱 Buscando agendamentos para pet: ${pet['nome']} (ID: $petId)');
         final responseAgs = await http.get(
           Uri.parse('${ApiConfig.baseUrl}/agendamentos?petId=$petId'),
         );
+        print('📱 Status agendamentos pet $petId: ${responseAgs.statusCode}');
         if (responseAgs.statusCode == 200) {
           final List<dynamic> agsPet = jsonDecode(responseAgs.body);
+          print('📱 Encontrados ${agsPet.length} agendamentos para pet ${pet['nome']}');
           for (final ag in agsPet) {
             ags.add({...ag, 'petNome': pet['nome']});
           }
+        } else {
+          print('❌ Erro ao buscar agendamentos do pet $petId: ${responseAgs.statusCode}');
         }
       }
+      print('📱 Total de agendamentos carregados: ${ags.length}');
       setState(() {
         agendamentos = ags;
         _aplicarFiltro();
       });
+    } else {
+      print('❌ Erro ao buscar pets: ${responsePets.statusCode}');
+      print('❌ Response body: ${responsePets.body}');
     }
   }
 
@@ -253,14 +269,18 @@ class _HistoricoAgendamentosPageState extends State<HistoricoAgendamentosPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Histórico de Agendamentos'),
+        title: const Text(
+          'Histórico de Agendamentos',
+          style: TextStyle(color: Colors.white),
+        ),
         centerTitle: true,
-        elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        elevation: 4,
+        shadowColor: Colors.blue.shade200,
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh, color: Colors.white),
             onPressed: _carregarDados,
           ),
         ],
@@ -279,9 +299,15 @@ class _HistoricoAgendamentosPageState extends State<HistoricoAgendamentosPage> {
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     value: filtroStatus,
+                    dropdownColor: Colors.white,
+                    style: TextStyle(color: Colors.black),
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.blue, width: 2),
                       ),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 12,

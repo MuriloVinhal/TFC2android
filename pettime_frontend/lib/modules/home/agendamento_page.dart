@@ -90,11 +90,18 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
 
   Future<void> _carregarPetsUsuario() async {
     final prefs = await SharedPreferences.getInstance();
-    final usuarioId = prefs.getInt('usuarioId');
-    if (usuarioId == null) return;
+    final usuarioId = prefs.getInt('user_id'); // Corrigido para user_id
+    if (usuarioId == null) {
+      print('❌ usuarioId não encontrado no SharedPreferences');
+      return;
+    }
+    
+    print('📱 Carregando pets para agendamento, usuário: $usuarioId');
     final response = await http.get(
       Uri.parse('${ApiConfig.baseUrl}/pets?usuarioId=$usuarioId'),
     );
+    
+    print('📱 Status response pets: ${response.statusCode}');
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
       setState(() {
@@ -103,6 +110,9 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
             .map<String>((pet) => pet['nome'] as String)
             .toList();
       });
+      print('✅ ${pets.length} pets carregados para agendamento: $pets');
+    } else {
+      print('❌ Erro ao carregar pets: ${response.statusCode}');
     }
   }
 
@@ -154,12 +164,16 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
       appBar: AppBar(
         title: const Text(
           'Banho e tosa',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
         centerTitle: true,
-        elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        elevation: 4,
+        shadowColor: Colors.blue.shade200,
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
@@ -302,6 +316,7 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -322,7 +337,7 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
                     return;
                   }
                   final prefs = await SharedPreferences.getInstance();
-                  final usuarioId = prefs.getInt('usuarioId');
+                  final usuarioId = prefs.getInt('user_id'); // Corrigido para user_id
                   if (usuarioId == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -438,9 +453,15 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
     return DropdownButtonFormField<String>(
       value: value,
       isExpanded: true,
+      dropdownColor: Colors.white,
+      style: TextStyle(color: Colors.black),
       decoration: InputDecoration(
         hintText: hint,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.blue, width: 2),
+        ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 12,
@@ -464,8 +485,16 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
       children: items.map((item) {
         final selected = values.contains(item);
         return FilterChip(
-          label: Text(item),
+          label: Text(
+            item,
+            style: TextStyle(
+              color: selected ? Colors.white : Colors.blue,
+            ),
+          ),
           selected: selected,
+          selectedColor: Colors.blue,
+          backgroundColor: Colors.blue.shade50,
+          checkmarkColor: Colors.white,
           onSelected: (v) {
             final newValues = List<String>.from(values);
             if (v) {
