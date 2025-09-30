@@ -95,12 +95,12 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
       print('❌ usuarioId não encontrado no SharedPreferences');
       return;
     }
-    
+
     print('📱 Carregando pets para agendamento, usuário: $usuarioId');
     final response = await http.get(
       Uri.parse('${ApiConfig.baseUrl}/pets?usuarioId=$usuarioId'),
     );
-    
+
     print('📱 Status response pets: ${response.statusCode}');
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
@@ -164,10 +164,7 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
       appBar: AppBar(
         title: const Text(
           'Banho e tosa',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
         centerTitle: true,
         elevation: 4,
@@ -337,7 +334,9 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
                     return;
                   }
                   final prefs = await SharedPreferences.getInstance();
-                  final usuarioId = prefs.getInt('user_id'); // Corrigido para user_id
+                  final usuarioId = prefs.getInt(
+                    'user_id',
+                  ); // Corrigido para user_id
                   if (usuarioId == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -487,9 +486,7 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
         return FilterChip(
           label: Text(
             item,
-            style: TextStyle(
-              color: selected ? Colors.white : Colors.blue,
-            ),
+            style: TextStyle(color: selected ? Colors.white : Colors.blue),
           ),
           selected: selected,
           selectedColor: Colors.blue,

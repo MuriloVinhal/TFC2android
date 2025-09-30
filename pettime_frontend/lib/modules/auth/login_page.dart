@@ -85,9 +85,10 @@ class _LoginPageState extends State<LoginPage> {
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: SizedBox(
-            height: MediaQuery.of(context).size.height - 
-                   MediaQuery.of(context).padding.top - 
-                   MediaQuery.of(context).padding.bottom,
+            height:
+                MediaQuery.of(context).size.height -
+                MediaQuery.of(context).padding.top -
+                MediaQuery.of(context).padding.bottom,
             child: Column(
               children: [
                 // Logo e título

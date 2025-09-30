@@ -89,12 +89,12 @@ class _HistoricoAgendamentosPageState extends State<HistoricoAgendamentosPage> {
       print('❌ usuarioId não encontrado no SharedPreferences');
       return;
     }
-    
+
     print('📱 Carregando agendamentos para usuário: $usuarioId');
     final responsePets = await http.get(
       Uri.parse('${ApiConfig.baseUrl}/pets?usuarioId=$usuarioId'),
     );
-    
+
     print('📱 Status response pets: ${responsePets.statusCode}');
     if (responsePets.statusCode == 200) {
       final List<dynamic> petsData = jsonDecode(responsePets.body);
@@ -108,12 +108,16 @@ class _HistoricoAgendamentosPageState extends State<HistoricoAgendamentosPage> {
         print('📱 Status agendamentos pet $petId: ${responseAgs.statusCode}');
         if (responseAgs.statusCode == 200) {
           final List<dynamic> agsPet = jsonDecode(responseAgs.body);
-          print('📱 Encontrados ${agsPet.length} agendamentos para pet ${pet['nome']}');
+          print(
+            '📱 Encontrados ${agsPet.length} agendamentos para pet ${pet['nome']}',
+          );
           for (final ag in agsPet) {
             ags.add({...ag, 'petNome': pet['nome']});
           }
         } else {
-          print('❌ Erro ao buscar agendamentos do pet $petId: ${responseAgs.statusCode}');
+          print(
+            '❌ Erro ao buscar agendamentos do pet $petId: ${responseAgs.statusCode}',
+          );
         }
       }
       print('📱 Total de agendamentos carregados: ${ags.length}');

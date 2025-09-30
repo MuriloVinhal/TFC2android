@@ -27,18 +27,18 @@ class _HomePageState extends State<HomePage> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final usuarioId = prefs.getInt('user_id'); // Corrigido para user_id
-      
+
       if (usuarioId == null) {
         print('❌ usuarioId não encontrado no SharedPreferences');
         setState(() => carregando = false);
         return;
       }
-      
+
       print('📱 Carregando pets para usuário: $usuarioId');
       final response = await http.get(
         Uri.parse('${ApiConfig.baseUrl}/pets?usuarioId=$usuarioId'),
       );
-      
+
       print('📱 Status response: ${response.statusCode}');
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
@@ -110,7 +110,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'PetTime', 
+          'PetTime',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 22,
@@ -122,7 +122,11 @@ class _HomePageState extends State<HomePage> {
         shadowColor: Colors.blue.shade200,
         actions: [
           IconButton(
-            icon: Icon(Icons.account_circle_rounded, size: 30, color: Colors.white),
+            icon: Icon(
+              Icons.account_circle_rounded,
+              size: 30,
+              color: Colors.white,
+            ),
             tooltip: 'Perfil',
             onPressed: () {
               Navigator.pushNamed(context, '/profile');
@@ -155,10 +159,7 @@ class _HomePageState extends State<HomePage> {
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
-                        colors: [
-                          Colors.blue.shade50,
-                          Colors.white,
-                        ],
+                        colors: [Colors.blue.shade50, Colors.white],
                       ),
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
@@ -178,7 +179,7 @@ class _HomePageState extends State<HomePage> {
                             Row(
                               children: [
                                 Icon(
-                                  Icons.pets_rounded, 
+                                  Icons.pets_rounded,
                                   color: Colors.blue,
                                   size: 24,
                                 ),
@@ -251,7 +252,8 @@ class _HomePageState extends State<HomePage> {
                                 shrinkWrap: true,
                                 physics: NeverScrollableScrollPhysics(),
                                 itemCount: pets.length,
-                                separatorBuilder: (_, __) => SizedBox(height: 8),
+                                separatorBuilder: (_, __) =>
+                                    SizedBox(height: 8),
                                 itemBuilder: (context, index) {
                                   final pet = pets[index];
                                   return Container(
@@ -270,7 +272,9 @@ class _HomePageState extends State<HomePage> {
                                         backgroundColor: Colors.blue.shade50,
                                         backgroundImage:
                                             (pet['foto'] != null &&
-                                                pet['foto'].toString().isNotEmpty)
+                                                pet['foto']
+                                                    .toString()
+                                                    .isNotEmpty)
                                             ? NetworkImage(
                                                 '${ApiConfig.baseUrl}${pet['foto']}',
                                               )
@@ -304,7 +308,8 @@ class _HomePageState extends State<HomePage> {
                                           Container(
                                             decoration: BoxDecoration(
                                               color: Colors.blue.shade50,
-                                              borderRadius: BorderRadius.circular(8),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
                                             ),
                                             child: IconButton(
                                               icon: Icon(
@@ -312,14 +317,16 @@ class _HomePageState extends State<HomePage> {
                                                 color: Colors.blue.shade600,
                                                 size: 20,
                                               ),
-                                              onPressed: () => _abrirEdicaoPet(pet),
+                                              onPressed: () =>
+                                                  _abrirEdicaoPet(pet),
                                             ),
                                           ),
                                           SizedBox(width: 8),
                                           Container(
                                             decoration: BoxDecoration(
                                               color: Colors.red.shade50,
-                                              borderRadius: BorderRadius.circular(8),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
                                             ),
                                             child: IconButton(
                                               icon: Icon(

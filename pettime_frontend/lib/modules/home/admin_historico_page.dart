@@ -470,10 +470,7 @@ class _AdminHistoricoPageState extends State<AdminHistoricoPage> {
       appBar: AppBar(
         title: Text(
           'Histórico - Admin',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
         centerTitle: true,
         elevation: 4,
@@ -482,7 +479,7 @@ class _AdminHistoricoPageState extends State<AdminHistoricoPage> {
         foregroundColor: Colors.white,
         actions: [
           IconButton(
-            icon: Icon(Icons.refresh, color: Colors.white), 
+            icon: Icon(Icons.refresh, color: Colors.white),
             onPressed: _carregarDados,
           ),
         ],

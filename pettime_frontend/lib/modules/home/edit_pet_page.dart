@@ -166,10 +166,7 @@ class _EditPetPageState extends State<EditPetPage> {
         elevation: 4,
         shadowColor: Colors.blue.shade200,
         foregroundColor: Colors.white,
-        title: const Text(
-          'Editar Pet',
-          style: TextStyle(color: Colors.white),
-        ),
+        title: const Text('Editar Pet', style: TextStyle(color: Colors.white)),
         actions: [
           IconButton(
             icon: const Icon(Icons.delete, color: Colors.white),
@@ -235,8 +232,9 @@ class _EditPetPageState extends State<EditPetPage> {
                   ],
                   onChanged: (value) => setState(() => porte = value ?? ''),
                   onSaved: (value) => porte = value ?? '',
-                  validator: (value) =>
-                      value == null || value.isEmpty ? 'Selecione o porte' : null,
+                  validator: (value) => value == null || value.isEmpty
+                      ? 'Selecione o porte'
+                      : null,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
@@ -275,7 +273,8 @@ class _EditPetPageState extends State<EditPetPage> {
                           : (_imageBase64 != null && _imageBase64!.isNotEmpty)
                           ? Builder(
                               builder: (context) {
-                                final url = '${ApiConfig.baseUrl}${_imageBase64!}';
+                                final url =
+                                    '${ApiConfig.baseUrl}${_imageBase64!}';
                                 print('URL da imagem: ' + url);
                                 return ClipRRect(
                                   borderRadius: BorderRadius.circular(18),

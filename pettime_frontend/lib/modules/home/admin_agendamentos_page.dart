@@ -699,10 +699,7 @@ class _AdminAgendamentosPageState extends State<AdminAgendamentosPage> {
       appBar: AppBar(
         title: Text(
           'Agendamentos - Admin',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
         centerTitle: true,
         elevation: 4,

@@ -45,44 +45,44 @@ class _RegisterPetPageState extends State<RegisterPetPage> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       final usuarioId = await getUsuarioId();
-      
+
       if (usuarioId == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Erro: usuário não identificado')),
         );
         return;
       }
-      
+
       try {
         final prefs = await SharedPreferences.getInstance();
         final token = prefs.getString('jwt_token'); // Corrigido para jwt_token
         final uri = Uri.parse('${ApiConfig.baseUrl}/pets');
         var request = http.MultipartRequest('POST', uri);
-        
+
         if (token != null) {
           request.headers['Authorization'] = 'Bearer $token';
         }
-        
+
         request.fields['nome'] = nome;
         request.fields['idade'] = idade;
         request.fields['porte'] = porte;
         request.fields['raca'] = raca;
         request.fields['usuarioId'] = usuarioId.toString();
-        
+
         // Foto é opcional
         if (_imageFile != null) {
           request.files.add(
             await http.MultipartFile.fromPath('foto', _imageFile!.path),
           );
         }
-        
+
         print('📱 Enviando dados do pet: nome=$nome, usuarioId=$usuarioId');
         final streamedResponse = await request.send();
         final response = await http.Response.fromStream(streamedResponse);
-        
+
         print('📱 Status cadastro pet: ${response.statusCode}');
         print('📱 Response body: ${response.body}');
-        
+
         if (response.statusCode == 201) {
           try {
             final data = jsonDecode(response.body);
@@ -191,8 +191,9 @@ class _RegisterPetPageState extends State<RegisterPetPage> {
                   ],
                   onChanged: (value) => setState(() => porte = value ?? ''),
                   onSaved: (value) => porte = value ?? '',
-                  validator: (value) =>
-                      value == null || value.isEmpty ? 'Selecione o porte' : null,
+                  validator: (value) => value == null || value.isEmpty
+                      ? 'Selecione o porte'
+                      : null,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
