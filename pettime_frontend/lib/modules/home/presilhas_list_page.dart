@@ -206,7 +206,10 @@ class _PresilhasListPageState extends State<PresilhasListPage> {
                                         ),
                                         onPressed: () =>
                                             _excluirPresilha(presilha['id']),
-                                        child: const Text('Excluir', style: TextStyle(color: Colors.white)),
+                                        child: const Text(
+                                          'Excluir',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
                                       ),
                                       const SizedBox(width: 8),
                                       OutlinedButton(
