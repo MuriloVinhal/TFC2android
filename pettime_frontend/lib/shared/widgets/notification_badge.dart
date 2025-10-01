@@ -60,10 +60,7 @@ class _NotificationBadgeState extends State<NotificationBadge> {
                   color: Colors.red,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                constraints: BoxConstraints(
-                  minWidth: 16,
-                  minHeight: 16,
-                ),
+                constraints: BoxConstraints(minWidth: 16, minHeight: 16),
                 child: Text(
                   _unreadCount > 99 ? '99+' : _unreadCount.toString(),
                   style: TextStyle(

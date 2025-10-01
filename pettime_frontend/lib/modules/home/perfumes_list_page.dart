@@ -206,7 +206,7 @@ class _PerfumesListPageState extends State<PerfumesListPage> {
                                         ),
                                         onPressed: () =>
                                             _excluirPerfume(perfume['id']),
-                                        child: const Text('Excluir'),
+                                        child: const Text('Excluir', style: TextStyle(color: Colors.white)),
                                       ),
                                       const SizedBox(width: 8),
                                       OutlinedButton(

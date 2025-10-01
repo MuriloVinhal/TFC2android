@@ -28,7 +28,7 @@ class _NotificacoesPageState extends State<NotificacoesPage> {
   Future<void> _marcarComoLida(int index) async {
     final notificacao = notificacoes[index];
     final sucesso = await NotificationService.marcarComoLida(notificacao['id']);
-    
+
     if (sucesso) {
       setState(() {
         notificacoes[index]['lida'] = true;
@@ -38,7 +38,7 @@ class _NotificacoesPageState extends State<NotificacoesPage> {
 
   Future<void> _marcarTodasComoLidas() async {
     final sucesso = await NotificationService.marcarTodasComoLidas();
-    
+
     if (sucesso) {
       setState(() {
         for (var notif in notificacoes) {
@@ -67,80 +67,79 @@ class _NotificacoesPageState extends State<NotificacoesPage> {
       body: carregando
           ? Center(child: CircularProgressIndicator())
           : notificacoes.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.notifications_none,
-                        size: 64,
-                        color: Colors.grey,
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.notifications_none, size: 64, color: Colors.grey),
+                  SizedBox(height: 16),
+                  Text(
+                    'Nenhuma notificação',
+                    style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                  ),
+                ],
+              ),
+            )
+          : RefreshIndicator(
+              onRefresh: _carregarNotificacoes,
+              child: ListView.builder(
+                itemCount: notificacoes.length,
+                itemBuilder: (context, index) {
+                  final notif = notificacoes[index];
+                  final isLida = notif['lida'] ?? false;
+                  final tipo = notif['tipo'] ?? '';
+
+                  return Card(
+                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    color: isLida ? null : Colors.blue.shade50,
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: Color(
+                          int.parse(NotificationService.getTipoColor(tipo)),
+                        ),
+                        child: Text(
+                          NotificationService.getTipoIcon(tipo),
+                          style: TextStyle(fontSize: 20),
+                        ),
                       ),
-                      SizedBox(height: 16),
-                      Text(
-                        'Nenhuma notificação',
+                      title: Text(
+                        notif['titulo'] ?? '',
                         style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.grey[600],
+                          fontWeight: isLida
+                              ? FontWeight.normal
+                              : FontWeight.bold,
                         ),
                       ),
-                    ],
-                  ),
-                )
-              : RefreshIndicator(
-                  onRefresh: _carregarNotificacoes,
-                  child: ListView.builder(
-                    itemCount: notificacoes.length,
-                    itemBuilder: (context, index) {
-                      final notif = notificacoes[index];
-                      final isLida = notif['lida'] ?? false;
-                      final tipo = notif['tipo'] ?? '';
-                      
-                      return Card(
-                        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                        color: isLida ? null : Colors.blue.shade50,
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor: Color(int.parse(NotificationService.getTipoColor(tipo))),
-                            child: Text(
-                              NotificationService.getTipoIcon(tipo),
-                              style: TextStyle(fontSize: 20),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: 4),
+                          Text(notif['mensagem'] ?? ''),
+                          SizedBox(height: 4),
+                          Text(
+                            NotificationService.formatarData(
+                              notif['createdAt'] ?? '',
                             ),
-                          ),
-                          title: Text(
-                            notif['titulo'] ?? '',
                             style: TextStyle(
-                              fontWeight: isLida ? FontWeight.normal : FontWeight.bold,
+                              fontSize: 12,
+                              color: Colors.grey[600],
                             ),
                           ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(height: 4),
-                              Text(notif['mensagem'] ?? ''),
-                              SizedBox(height: 4),
-                              Text(
-                                NotificationService.formatarData(notif['createdAt'] ?? ''),
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                            ],
-                          ),
-                          trailing: isLida
-                              ? null
-                              : IconButton(
-                                  icon: Icon(Icons.check_circle_outline),
-                                  onPressed: () => _marcarComoLida(index),
-                                  tooltip: 'Marcar como lida',
-                                ),
-                          onTap: !isLida ? () => _marcarComoLida(index) : null,
-                        ),
-                      );
-                    },
-                  ),
-                ),
+                        ],
+                      ),
+                      trailing: isLida
+                          ? null
+                          : IconButton(
+                              icon: Icon(Icons.check_circle_outline),
+                              onPressed: () => _marcarComoLida(index),
+                              tooltip: 'Marcar como lida',
+                            ),
+                      onTap: !isLida ? () => _marcarComoLida(index) : null,
+                    ),
+                  );
+                },
+              ),
+            ),
     );
   }
 }

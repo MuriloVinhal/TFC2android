@@ -10,7 +10,7 @@ class NotificationService {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-      
+
       if (token == null) return [];
 
       final response = await http.get(
@@ -25,7 +25,7 @@ class NotificationService {
         final List<dynamic> data = jsonDecode(response.body);
         return data.cast<Map<String, dynamic>>();
       }
-      
+
       return [];
     } catch (e) {
       print('Erro ao buscar notificações: $e');
@@ -37,7 +37,7 @@ class NotificationService {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-      
+
       if (token == null) return 0;
 
       final response = await http.get(
@@ -52,7 +52,7 @@ class NotificationService {
         final Map<String, dynamic> data = jsonDecode(response.body);
         return data['count'] ?? 0;
       }
-      
+
       return 0;
     } catch (e) {
       print('Erro ao contar notificações não lidas: $e');
@@ -64,7 +64,7 @@ class NotificationService {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-      
+
       if (token == null) return false;
 
       final response = await http.put(
@@ -86,7 +86,7 @@ class NotificationService {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-      
+
       if (token == null) return false;
 
       final response = await http.put(
