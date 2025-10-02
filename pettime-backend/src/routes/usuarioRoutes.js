@@ -8,6 +8,8 @@ const Usuario = db.Usuario;
 router.post('/login', usuarioController.login);
 
 router.post('/register', usuarioController.register);
+// Recuperação de senha
+router.post('/recuperar-senha', usuarioController.recuperarSenha);
 
 router.get('/me', authMiddleware, async (req, res) => {
     try {
