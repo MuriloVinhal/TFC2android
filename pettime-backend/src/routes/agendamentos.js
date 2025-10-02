@@ -21,7 +21,7 @@ router.get('/all', async (req, res) => {
         res.json(agendamentos);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Erro ao buscar agendamentos' });
+  res.status(500).json({ error: 'Erro ao buscar agendamentos', message: 'Erro ao buscar agendamentos' });
     }
 });
 
@@ -47,7 +47,7 @@ router.get('/', async (req, res) => {
     res.json(itens);
   } catch (e) {
     console.error(e);
-    res.status(500).json({ error: 'Erro ao listar agendamentos' });
+  res.status(500).json({ error: 'Erro ao listar agendamentos', message: 'Erro ao listar agendamentos' });
   }
 });
 
@@ -69,21 +69,21 @@ router.post('/', async (req, res) => {
 
     if (!petId || !servicoId || !data || !horario) {
       await t.rollback();
-      return res.status(400).json({ error: 'Campos obrigatórios ausentes.' });
+  return res.status(400).json({ error: 'Campos obrigatórios ausentes.', message: 'Campos obrigatórios ausentes.' });
     }
 
     // Valida formato de horário HH:mm e janela de atendimento
     const horaMatch = /^([0-1]?\d|2[0-3]):([0-5]\d)$/.exec(String(horario));
     if (!horaMatch) {
       await t.rollback();
-      return res.status(400).json({ error: 'Horário inválido. Use HH:mm.' });
+  return res.status(400).json({ error: 'Horário inválido. Use HH:mm.', message: 'Horário inválido. Use HH:mm.' });
     }
     const hora = parseInt(horaMatch[1], 10);
     const minuto = parseInt(horaMatch[2], 10);
     // Janela de atendimento: 09:00 às 16:00, intervalos de 60 minutos
     if (minuto !== 0 || hora < 9 || hora > 16) {
       await t.rollback();
-      return res.status(400).json({ error: 'Horário fora da janela de atendimento.' });
+  return res.status(400).json({ error: 'Horário fora da janela de atendimento.', message: 'Horário fora da janela de atendimento.' });
     }
 
     // Monta Date do agendamento no fuso do servidor
@@ -92,36 +92,36 @@ router.post('/', async (req, res) => {
     const agora = new Date();
     if (isNaN(agendamentoDate.getTime())) {
       await t.rollback();
-      return res.status(400).json({ error: 'Data ou horário inválidos.' });
+  return res.status(400).json({ error: 'Data ou horário inválidos.', message: 'Data ou horário inválidos.' });
     }
     // Bloqueia domingo
     const diaSemana = agendamentoDate.getDay(); // 0=Dom
     if (diaSemana === 0) {
       await t.rollback();
-      return res.status(400).json({ error: 'Agendamentos não são permitidos aos domingos.' });
+  return res.status(400).json({ error: 'Agendamentos não são permitidos aos domingos.', message: 'Agendamentos não são permitidos aos domingos.' });
     }
     // Horário no passado
     if (agendamentoDate.getTime() <= agora.getTime()) {
       await t.rollback();
-      return res.status(400).json({ error: 'Não é possível agendar em horário passado.' });
+  return res.status(400).json({ error: 'Não é possível agendar em horário passado.', message: 'Não é possível agendar em horário passado.' });
     }
 
     // Verificações de existência
     const pet = await Pet.findByPk(petId);
     if (!pet) {
       await t.rollback();
-      return res.status(404).json({ error: 'Pet não encontrado.' });
+  return res.status(404).json({ error: 'Pet não encontrado.', message: 'Pet não encontrado.' });
     }
     const serv = await Servico.findByPk(servicoId);
     if (!serv) {
       await t.rollback();
-      return res.status(404).json({ error: 'Serviço não encontrado.' });
+  return res.status(404).json({ error: 'Serviço não encontrado.', message: 'Serviço não encontrado.' });
     }
     if (tosaId) {
       const tosaEnt = await Tosa.findByPk(tosaId);
       if (!tosaEnt) {
         await t.rollback();
-        return res.status(404).json({ error: 'Tosa não encontrada.' });
+  return res.status(404).json({ error: 'Tosa não encontrada.', message: 'Tosa não encontrada.' });
       }
     }
 
@@ -133,7 +133,7 @@ router.post('/', async (req, res) => {
     });
     if (conflito && statusesQueOcupam.includes(String(conflito.status))) {
       await t.rollback();
-      return res.status(409).json({ error: 'Horário indisponível. Já existe agendamento neste horário.' });
+  return res.status(409).json({ error: 'Horário indisponível. Já existe agendamento neste horário.', message: 'Horário indisponível. Já existe agendamento neste horário.' });
     }
 
     const novo = await Agendamento.create(
@@ -174,7 +174,7 @@ router.post('/', async (req, res) => {
   } catch (e) {
     console.error(e);
     try { await t.rollback(); } catch (_) {}
-    return res.status(500).json({ error: 'Erro ao criar agendamento' });
+  return res.status(500).json({ error: 'Erro ao criar agendamento', message: 'Erro ao criar agendamento' });
   }
 });
 
@@ -183,7 +183,7 @@ router.put('/:id/approve', async (req, res) => {
   try {
     const { id } = req.params;
     const ag = await Agendamento.findByPk(id, { include: [{ model: Pet, as: 'pet' }] });
-    if (!ag) return res.status(404).json({ error: 'Agendamento não encontrado' });
+  if (!ag) return res.status(404).json({ error: 'Agendamento não encontrado', message: 'Agendamento não encontrado' });
     ag.status = 'aprovado';
     await ag.save();
 
@@ -199,7 +199,7 @@ router.put('/:id/approve', async (req, res) => {
     res.json(ag);
   } catch (e) {
     console.error(e);
-    res.status(500).json({ error: 'Erro ao aprovar agendamento' });
+  res.status(500).json({ error: 'Erro ao aprovar agendamento', message: 'Erro ao aprovar agendamento' });
   }
 });
 
@@ -209,7 +209,7 @@ router.put('/:id/status', async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
     const ag = await Agendamento.findByPk(id, { include: [{ model: Pet, as: 'pet' }] });
-    if (!ag) return res.status(404).json({ error: 'Agendamento não encontrado' });
+  if (!ag) return res.status(404).json({ error: 'Agendamento não encontrado', message: 'Agendamento não encontrado' });
     ag.status = status;
     await ag.save();
 
@@ -225,7 +225,7 @@ router.put('/:id/status', async (req, res) => {
     res.json(ag);
   } catch (e) {
     console.error(e);
-    res.status(500).json({ error: 'Erro ao alterar status' });
+  res.status(500).json({ error: 'Erro ao alterar status', message: 'Erro ao alterar status' });
   }
 });
 

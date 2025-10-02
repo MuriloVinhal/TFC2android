@@ -17,7 +17,7 @@ router.get('/me', authMiddleware, async (req, res) => {
         console.log('Model Usuario:', Usuario); // Adicione este log
         const usuario = await Usuario.findByPk(req.userId);
         console.log('Usuário encontrado:', usuario);
-        if (!usuario) return res.status(404).json({ erro: 'Usuário não encontrado' });
+    if (!usuario) return res.status(404).json({ erro: 'Usuário não encontrado', message: 'Usuário não encontrado' });
         res.json({
             nome: usuario.nome,
             email: usuario.email,
@@ -26,14 +26,14 @@ router.get('/me', authMiddleware, async (req, res) => {
         });
     } catch (err) {
         console.error('Erro detalhado ao buscar usuário:', err); // Log detalhado
-        res.status(500).json({ erro: 'Erro ao buscar usuário' });
+    res.status(500).json({ erro: 'Erro ao buscar usuário', message: 'Erro ao buscar usuário' });
     }
 });
 
 router.put('/me', authMiddleware, async (req, res) => {
     try {
         const usuario = await Usuario.findByPk(req.userId);
-        if (!usuario) return res.status(404).json({ erro: 'Usuário não encontrado' });
+    if (!usuario) return res.status(404).json({ erro: 'Usuário não encontrado', message: 'Usuário não encontrado' });
 
         const { nome, email, telefone, endereco, senha } = req.body;
         usuario.nome = nome ?? usuario.nome;
@@ -53,8 +53,8 @@ router.put('/me', authMiddleware, async (req, res) => {
             endereco: usuario.endereco
         });
     } catch (err) {
-        console.error('Erro ao atualizar usuário:', err);
-        res.status(500).json({ erro: 'Erro ao atualizar usuário' });
+    console.error('Erro ao atualizar usuário:', err);
+    res.status(500).json({ erro: 'Erro ao atualizar usuário', message: 'Erro ao atualizar usuário' });
     }
 });
 

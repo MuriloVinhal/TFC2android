@@ -53,3 +53,7 @@ sequelize.authenticate()
 
 // ✅ Exporta app para uso no server.js
 module.exports = app;
+
+// Middleware global de tratamento de erros (deve ficar após as rotas)
+const errorHandler = require('./middlewares/errorHandler');
+app.use(errorHandler);
