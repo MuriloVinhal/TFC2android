@@ -29,28 +29,38 @@ class FormValidator {
     return null;
   }
 
-  /// Valida senha com critérios de segurança
+  /// Valida senha com critérios de segurança rigorosos
   static String? validarSenha(String? senha) {
     if (senha == null || senha.isEmpty) {
       return 'Senha é obrigatória';
     }
 
-    if (senha.length < 6) {
-      return 'Senha deve ter pelo menos 6 caracteres';
+    if (senha.length < 8) {
+      return 'A senha deve ter no mínimo 8 caracteres';
     }
 
     if (senha.length > 50) {
       return 'Senha muito longa (máximo 50 caracteres)';
     }
 
-    // Verifica se tem pelo menos uma letra
-    if (!RegExp(r'[a-zA-Z]').hasMatch(senha)) {
-      return 'Senha deve conter pelo menos uma letra';
+    // Verifica se tem pelo menos uma letra maiúscula
+    if (!RegExp(r'[A-Z]').hasMatch(senha)) {
+      return 'Senha deve conter pelo menos uma letra maiúscula';
+    }
+
+    // Verifica se tem pelo menos uma letra minúscula
+    if (!RegExp(r'[a-z]').hasMatch(senha)) {
+      return 'Senha deve conter pelo menos uma letra minúscula';
     }
 
     // Verifica se tem pelo menos um número
     if (!RegExp(r'\d').hasMatch(senha)) {
       return 'Senha deve conter pelo menos um número';
+    }
+
+    // Verifica se tem pelo menos um símbolo
+    if (!RegExp(r'''[!@#\$%\^&\*\(\)_\+\-=\[\]{};:'",.<>?]''').hasMatch(senha)) {
+      return 'Senha deve conter pelo menos um símbolo';
     }
 
     return null;

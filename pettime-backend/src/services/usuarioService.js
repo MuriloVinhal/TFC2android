@@ -1,7 +1,7 @@
 const db = require('../models');
 const Usuario = db.Usuario;
 
-export const criarUsuario = async (dadosUsuario) => {
+const criarUsuario = async (dadosUsuario) => {
     try {
         const usuario = await Usuario.create(dadosUsuario);
         return usuario;
@@ -10,7 +10,7 @@ export const criarUsuario = async (dadosUsuario) => {
     }
 };
 
-export const listarUsuarios = async () => {
+const listarUsuarios = async () => {
     try {
         const usuarios = await Usuario.findAll({ where: { deletado: false } });
         return usuarios;
@@ -19,7 +19,7 @@ export const listarUsuarios = async () => {
     }
 };
 
-export const atualizarUsuario = async (id, dadosAtualizados) => {
+const atualizarUsuario = async (id, dadosAtualizados) => {
     try {
         const usuario = await Usuario.findByPk(id);
         if (!usuario) {
@@ -32,7 +32,7 @@ export const atualizarUsuario = async (id, dadosAtualizados) => {
     }
 };
 
-export const deletarUsuario = async (id) => {
+const deletarUsuario = async (id) => {
     try {
         const usuario = await Usuario.findByPk(id);
         if (!usuario) {
@@ -43,4 +43,11 @@ export const deletarUsuario = async (id) => {
     } catch (error) {
         throw new Error('Erro ao deletar usuário: ' + error.message);
     }
+};
+
+module.exports = {
+    criarUsuario,
+    listarUsuarios,
+    atualizarUsuario,
+    deletarUsuario
 };

@@ -7,6 +7,7 @@ import '../../core/theme/app_colors.dart';
 import '../../shared/widgets/custom_button.dart';
 import '../../shared/widgets/custom_text_field.dart';
 import '../../core/utils/api_config.dart';
+import '../../core/utils/error_handler.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -63,15 +64,18 @@ class _LoginPageState extends State<LoginPage> {
         }
       } else {
         final erro = jsonDecode(resposta.body);
+        final mensagemErro = ErrorHandler.extractErrorMessage(erro);
+        
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(erro['error'] ?? 'Erro desconhecido')),
+          SnackBar(content: Text(mensagemErro)),
         );
       }
     } catch (e) {
       setState(() => carregando = false);
+      final mensagemErro = ErrorHandler.handleConnectionError(e);
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Erro de conexão: $e')));
+      ).showSnackBar(SnackBar(content: Text(mensagemErro)));
     }
   }
 

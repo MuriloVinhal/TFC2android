@@ -1,9 +1,9 @@
-import { Usuario } from '../models/Usuario';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
-
 dotenv.config();
+const db = require('../models');
+const Usuario = db.Usuario;
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 const authService = {
     async register(userData) {

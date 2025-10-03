@@ -30,7 +30,9 @@ const produtoRoutes = require('./routes/produtoRoutes');
 const agendamentosRouter = require('./routes/agendamentos');
 const notificacaoRoutes = require('./routes/notificacaoRoutes');
 const pushNotificationRoutes = require('./routes/notifications');
+const servicoRoutes = require('./routes/servicoRoutes');
 
+app.use('/servico', servicoRoutes);
 app.use('/tosas', tosaRoutes);
 app.use('/servicos-adicionais', servicoAdicionalRoutes);
 app.use('/produtos', produtoRoutes);

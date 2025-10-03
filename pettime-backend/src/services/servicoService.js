@@ -1,4 +1,4 @@
-import { Servico } from '../models/Servico.js';
+const Servico = require('../models/servico');
 
 const servicoService = {
     async createServico(data) {
@@ -60,4 +60,4 @@ const servicoService = {
     }
 };
 
-export default servicoService;
+module.exports = servicoService;

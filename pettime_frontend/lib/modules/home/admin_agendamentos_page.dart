@@ -199,7 +199,7 @@ class _AdminAgendamentosPageState extends State<AdminAgendamentosPage> {
         return AlertDialog(
           title: Text('Concluir Agendamento'),
           content: Text(
-            'Deseja enviar uma mensagem ao cliente informando o status do agendamento?',
+            'O cliente será notificado, deseja concluir o serviço?',
           ),
           actions: [
             TextButton(
@@ -649,7 +649,28 @@ class _AdminAgendamentosPageState extends State<AdminAgendamentosPage> {
                 ),
                 if (isPendente) ...[
                   ElevatedButton(
-                    onPressed: () => _reprovarAgendamento(agendamento['id']),
+                    onPressed: () async {
+                      final confirmar = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Text('Confirmar reprovação'),
+                          content: Text('Deseja realmente reprovar este agendamento? O cliente será notificado.'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(false),
+                              child: Text('Cancelar'),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(true),
+                              child: Text('Reprovar'),
+                            ),
+                          ],
+                        ),
+                      );
+                      if (confirmar == true) {
+                        await _reprovarAgendamento(agendamento['id']);
+                      }
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                       foregroundColor: Colors.white,

@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/utils/api_config.dart';
+import '../../core/utils/validators.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -228,13 +229,23 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   String? _validarSenha(String? value) {
+    // Se os campos de senha estão sendo preenchidos, aplica validações
     if (novaSenhaController.text.isNotEmpty ||
         confirmarSenhaController.text.isNotEmpty) {
-      if (novaSenhaController.text.length < 6) {
-        return 'A senha deve ter pelo menos 6 caracteres';
+      
+      // Valida a nova senha com os critérios rigorosos
+      String? erroSenha = FormValidator.validarSenha(novaSenhaController.text);
+      if (erroSenha != null) {
+        return erroSenha;
       }
-      if (novaSenhaController.text != confirmarSenhaController.text) {
-        return 'As senhas não coincidem';
+      
+      // Valida confirmação de senha
+      String? erroConfirmacao = FormValidator.validarConfirmacaoSenha(
+        novaSenhaController.text, 
+        confirmarSenhaController.text
+      );
+      if (erroConfirmacao != null) {
+        return erroConfirmacao;
       }
     }
     return null;

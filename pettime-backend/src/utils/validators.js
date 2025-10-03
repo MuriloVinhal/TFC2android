@@ -143,13 +143,23 @@ function validarSenha(senha) {
     return false;
   }
   
-  // Deve conter pelo menos uma letra
-  if (!/[a-zA-Z]/.test(senha)) {
+  // Deve conter pelo menos uma letra maiúscula
+  if (!/[A-Z]/.test(senha)) {
+    return false;
+  }
+  
+  // Deve conter pelo menos uma letra minúscula
+  if (!/[a-z]/.test(senha)) {
     return false;
   }
   
   // Deve conter pelo menos um número
   if (!/[0-9]/.test(senha)) {
+    return false;
+  }
+  
+  // Deve conter pelo menos um símbolo
+  if (!/[!@#\$%\^&\*\(\)_\+\-=\[\]{};:'",.<>?]/.test(senha)) {
     return false;
   }
   

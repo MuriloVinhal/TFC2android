@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../../core/utils/api_config.dart';
+import '../../core/utils/error_handler.dart';
+import '../../core/utils/validators.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import '../../core/theme/app_colors.dart';
 import '../../shared/widgets/custom_button.dart';
@@ -55,23 +57,23 @@ class _RegisterPageState extends State<RegisterPage> {
         );
         Navigator.pop(context);
       } else {
+        final erro = jsonDecode(resposta.body);
+        final mensagemErro = ErrorHandler.extractErrorMessage(erro, 'Erro ao cadastrar');
+        
         print(
-          'Erro ao cadastrar:  [200m${resposta.statusCode} [0m -  [200m${resposta.body} [0m',
+          'Erro ao cadastrar: ${resposta.statusCode} - ${resposta.body}',
         );
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Erro ao cadastrar. Código:  [200m${resposta.statusCode} [0m',
-            ),
-          ),
+          SnackBar(content: Text(mensagemErro)),
         );
       }
     } catch (e) {
       setState(() => carregando = false);
+      final mensagemErro = ErrorHandler.handleConnectionError(e);
       print('Erro de conexão: $e');
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Erro de conexão: $e')));
+      ).showSnackBar(SnackBar(content: Text(mensagemErro)));
     }
   }
 
@@ -95,21 +97,7 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   String? validarSenha(String? value) {
-    if (value == null || value.length < 8) {
-      return 'A senha deve ter no mínimo 8 caracteres';
-    }
-    final hasUpper = value.contains(RegExp(r'[A-Z]'));
-    final hasLower = value.contains(RegExp(r'[a-z]'));
-    final hasDigit = value.contains(RegExp(r'\d'));
-    final hasSymbol = value.contains(
-      RegExp(r'''[!@#\$%\^&\*\(\)_\+\-=\[\]{};:'",.<>?]'''),
-    );
-
-    if (!(hasUpper && hasLower && hasDigit && hasSymbol)) {
-      return 'Use letras maiúsculas, minúsculas, números e símbolos';
-    }
-
-    return null;
+    return FormValidator.validarSenha(value);
   }
 
   @override

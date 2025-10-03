@@ -1,6 +1,7 @@
-import { Agendamento } from '../models/Agendamento';
+const db = require('../models');
+const Agendamento = db.Agendamento;
 
-export const criarAgendamento = async (dadosAgendamento) => {
+const criarAgendamento = async (dadosAgendamento) => {
     try {
         const novoAgendamento = await Agendamento.create(dadosAgendamento);
         return novoAgendamento;
@@ -9,7 +10,7 @@ export const criarAgendamento = async (dadosAgendamento) => {
     }
 };
 
-export const listarAgendamentos = async () => {
+const listarAgendamentos = async () => {
     try {
         const agendamentos = await Agendamento.findAll();
         return agendamentos;
@@ -18,7 +19,7 @@ export const listarAgendamentos = async () => {
     }
 };
 
-export const aprovarAgendamento = async (id) => {
+const aprovarAgendamento = async (id) => {
     try {
         const agendamento = await Agendamento.findByPk(id);
         if (!agendamento) {
@@ -30,4 +31,10 @@ export const aprovarAgendamento = async (id) => {
     } catch (error) {
         throw new Error('Erro ao aprovar agendamento: ' + error.message);
     }
+};
+
+module.exports = {
+    criarAgendamento,
+    listarAgendamentos,
+    aprovarAgendamento
 };

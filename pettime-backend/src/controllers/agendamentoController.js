@@ -1,7 +1,7 @@
-import db from '../models/index.js';
+const db = require('../models');
 const Agendamento = db.Agendamento;
 
-export const createAgendamento = async (req, res) => {
+const createAgendamento = async (req, res) => {
     try {
         // Recebe todos os campos possíveis do frontend
         const {
@@ -16,6 +16,25 @@ export const createAgendamento = async (req, res) => {
             produtos = [], // array de IDs de produtos
             servicosAdicionais = [] // array de IDs de serviços adicionais
         } = req.body;
+        
+        // Validar se o horário já está ocupado por um agendamento com status diferente de aguardando ou reprovado
+        const agendamentosExistentes = await Agendamento.findAll({
+            where: {
+                data: data,
+                horario: horario,
+                status: {
+                  [db.Sequelize.Op.notIn]: ['aguardando', 'reprovado', null]
+                }
+            }
+        });
+
+        if (agendamentosExistentes.length > 0) {
+            return res.status(400).json({ 
+                message: 'Este horário já está ocupado. Por favor, escolha outro horário.',
+                erro: 'Este horário já está ocupado. Por favor, escolha outro horário.'
+            });
+        }
+        
         const novoAgendamento = await Agendamento.create({
             petId,
             servicoId,
@@ -63,6 +82,11 @@ export const getAgendamentos = async (req, res) => {
             const end = new Date(data);
             end.setHours(23, 59, 59, 999);
             where.data = { $gte: start, $lte: end };
+            
+            // Para consulta de horários ocupados, filtrar apenas agendamentos aprovados
+            if (!petId) {
+                where.status = 'aprovado';
+            }
         }
         if (petId) {
             where.petId = petId;
@@ -138,4 +162,12 @@ export const vincularProdutosServicosTeste = async (req, res) => {
     } catch (error) {
         return res.status(500).json({ message: 'Erro ao vincular', error });
     }
+};
+
+module.exports = {
+  createAgendamento,
+  getAgendamentos,
+  approveAgendamento,
+  deleteAgendamento,
+  vincularProdutosServicosTeste
 };

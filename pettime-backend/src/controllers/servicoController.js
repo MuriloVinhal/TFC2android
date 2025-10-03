@@ -1,16 +1,16 @@
-import { Servico } from '../models/Servico.js';
+const db = require('../models');
+const Servico = db.Servico;
 
-export const createServico = async (req, res) => {
+const createServico = async (req, res) => {
     try {
-        const { nome, preco } = req.body;
-        const novoServico = await Servico.create({ nome, preco });
+        const { tipo } = req.body;
+        const novoServico = await Servico.create({ tipo });
         res.status(201).json(novoServico);
     } catch (error) {
         res.status(500).json({ message: 'Erro ao criar serviço', error });
     }
 };
-
-export const getServicos = async (req, res) => {
+const getServicos = async (req, res) => {
     try {
         const servicos = await Servico.findAll();
         res.status(200).json(servicos);
@@ -18,12 +18,11 @@ export const getServicos = async (req, res) => {
         res.status(500).json({ message: 'Erro ao listar serviços', error });
     }
 };
-
-export const updateServico = async (req, res) => {
+const updateServico = async (req, res) => {
     try {
         const { id } = req.params;
-        const { nome, preco } = req.body;
-        const [updated] = await Servico.update({ nome, preco }, { where: { id } });
+        const { tipo } = req.body;
+        const [updated] = await Servico.update({ tipo }, { where: { id } });
         if (updated) {
             const updatedServico = await Servico.findOne({ where: { id } });
             res.status(200).json(updatedServico);
@@ -35,7 +34,7 @@ export const updateServico = async (req, res) => {
     }
 };
 
-export const deleteServico = async (req, res) => {
+const deleteServico = async (req, res) => {
     try {
         const { id } = req.params;
         const deleted = await Servico.destroy({ where: { id } });
@@ -47,4 +46,11 @@ export const deleteServico = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: 'Erro ao deletar serviço', error });
     }
+};
+
+module.exports = {
+  createServico,
+  getServicos,
+  updateServico,
+  deleteServico
 };

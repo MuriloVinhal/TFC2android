@@ -13,7 +13,7 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
   // Dropdowns
   String? servico;
   String? tosa;
-  List<String> servicosAdicionais = [];
+  List<String> servicosAdicionais = ['Nenhum serviço adicional'];
   String? taxiDog;
   String? petSelecionado;
   String observacoes = '';
@@ -47,6 +47,8 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
   final DateTime semanaBase = DateTime(2023, 11, 12); // Exemplo
   List<Map<String, dynamic>> presilhas = [];
   List<Map<String, dynamic>> perfumes = [];
+  List<Map<String, dynamic>> servicosDisponiveis = [];
+  List<Map<String, dynamic>> tosasDisponiveis = [];
   DateTime semanaAtual =
       DateTime.now(); // Nova variável para controlar a semana exibida
 
@@ -55,6 +57,7 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
     super.initState();
     _carregarPetsUsuario();
     _carregarPresilhasPerfumes();
+    _carregarServicosETosas();
     _ajustarSemanaParaSegunda();
   }
 
@@ -137,6 +140,37 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
     } catch (_) {}
   }
 
+  Future<void> _carregarServicosETosas() async {
+    try {
+      final respServicos = await http.get(
+        Uri.parse('${ApiConfig.baseUrl}/servico'),
+      );
+      final respTosas = await http.get(
+        Uri.parse('${ApiConfig.baseUrl}/tosas'),
+      );
+      
+      if (respServicos.statusCode == 200) {
+        setState(() {
+          servicosDisponiveis = List<Map<String, dynamic>>.from(
+            jsonDecode(respServicos.body),
+          );
+        });
+        print('✅ Serviços carregados: $servicosDisponiveis');
+      }
+      
+      if (respTosas.statusCode == 200) {
+        setState(() {
+          tosasDisponiveis = List<Map<String, dynamic>>.from(
+            jsonDecode(respTosas.body),
+          );
+        });
+        print('✅ Tosas carregadas: $tosasDisponiveis');
+      }
+    } catch (e) {
+      print('❌ Erro ao carregar serviços/tosas: $e');
+    }
+  }
+
   void _onSelecionarData(DateTime date) async {
     setState(() {
       dataSelecionada = date;
@@ -145,16 +179,23 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
     });
     final dataStr =
         "${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+    print('📅 Buscando horários ocupados para: $dataStr');
     final response = await http.get(
       Uri.parse('${ApiConfig.baseUrl}/agendamentos?data=$dataStr'),
     );
+    print('📅 Status da resposta: ${response.statusCode}');
     if (response.statusCode == 200) {
       final List<dynamic> ags = jsonDecode(response.body);
+      print('📅 Agendamentos encontrados: ${ags.length}');
+      print('📅 Dados dos agendamentos: $ags');
       setState(() {
         horariosOcupados = ags
             .map<String>((a) => a['horario'] as String)
             .toList();
       });
+      print('📅 Horários ocupados: $horariosOcupados');
+    } else {
+      print('❌ Erro ao buscar agendamentos: ${response.statusCode} - ${response.body}');
     }
   }
 
@@ -220,7 +261,7 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
             const SizedBox(height: 8),
             _buildMultiSelect(
               values: servicosAdicionais,
-              items: ['Corte de unha', 'Escovação'],
+              items: ['Nenhum serviço adicional', 'Corte de unha', 'Escovação'],
               hint: 'Selecione os serviços',
               onChanged: (v) => setState(() => servicosAdicionais = v),
             ),
@@ -333,6 +374,17 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
                     );
                     return;
                   }
+                  
+                  // Validar se o horário não está ocupado
+                  if (horariosOcupados.contains(horarioSelecionado)) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Este horário não está mais disponível. Por favor, escolha outro horário.'),
+                      ),
+                    );
+                    return;
+                  }
+                  
                   final prefs = await SharedPreferences.getInstance();
                   final usuarioId = prefs.getInt(
                     'user_id',
@@ -377,6 +429,7 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
                   // Mapear nomes dos serviços adicionais para IDs (ajuste conforme seu backend)
                   final List<int> servicosAdicionaisSelecionados =
                       servicosAdicionais
+                          .where((s) => s != 'Nenhum serviço adicional') // Filtra a opção "Nenhum"
                           .map((s) {
                             if (s == 'Corte de unha') return 1;
                             if (s == 'Escovação') return 2;
@@ -385,15 +438,61 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
                           .where((id) => id != 0)
                           .toList();
 
+                  // Depuração: mostrar serviços disponíveis e serviço selecionado
+                  print('Serviços disponíveis (completo):');
+                  print(servicosDisponiveis);
+                  for (var s in servicosDisponiveis) {
+                    print('ID: \'${s['id']}\' Tipo: \'${s['tipo']}\'');
+                  }
+                  print('Serviço selecionado: $servico');
+
+                  int? servicoIdSelecionado;
+                  if (servico != null && servicosDisponiveis.isNotEmpty) {
+                    // Busca por igualdade exata
+                    final encontrado = servicosDisponiveis.firstWhere(
+                      (s) => s['tipo'] != null &&
+                        s['tipo'].toString().trim().toLowerCase() == servico!.trim().toLowerCase(),
+                      orElse: () {
+                        print('Serviço "$servico" não encontrado, usando o primeiro disponível.');
+                        return servicosDisponiveis.first;
+                      },
+                    );
+                    servicoIdSelecionado = encontrado['id'];
+                    print('Resultado do mapeamento: servicoIdSelecionado = $servicoIdSelecionado');
+                    if (encontrado['tipo'].toString().trim().toLowerCase() != servico!.trim().toLowerCase()) {
+                      print('⚠️ Atenção: serviço selecionado "$servico" não bate com nenhum tipo do backend.');
+                    }
+                  }
+                  // Se ainda não encontrou, usa o primeiro disponível
+                  if (servicoIdSelecionado == null && servicosDisponiveis.isNotEmpty) {
+                    servicoIdSelecionado = servicosDisponiveis.first['id'];
+                    print('Serviço não reconhecido, usando o primeiro disponível: ID $servicoIdSelecionado');
+                  }
+                  
+                  // Mapear tosa selecionada para ID
+                  int? tosaIdSelecionado;
+                  if (tosa != null && tosasDisponiveis.isNotEmpty) {
+                    if (tosa == 'Tosa completa') {
+                      tosaIdSelecionado = tosasDisponiveis
+                          .firstWhere((t) => t['tipo'].toString().toLowerCase().contains('completa'), 
+                              orElse: () => tosasDisponiveis.first)['id'];
+                    } else if (tosa == 'Tosa bebê') {
+                      tosaIdSelecionado = tosasDisponiveis
+                          .firstWhere((t) => t['tipo'].toString().toLowerCase().contains('bebê'), 
+                              orElse: () => tosasDisponiveis.first)['id'];
+                    } else if (tosa == 'Tosa higiênica') {
+                      tosaIdSelecionado = tosasDisponiveis
+                          .firstWhere((t) => t['tipo'].toString().toLowerCase().contains('higiênica'), 
+                              orElse: () => tosasDisponiveis.first)['id'];
+                    }
+                  }
+
                   // Montar dados do agendamento
                   final dataStr =
                       '${dataSelecionada!.year.toString().padLeft(4, '0')}-${dataSelecionada!.month.toString().padLeft(2, '0')}-${dataSelecionada!.day.toString().padLeft(2, '0')}';
                   final body = {
                     'petId': petId,
-                    'servicoId': 1, // Ajuste conforme necessário
-                    'tosaId': precisaTosa
-                        ? 1
-                        : null, // Ajuste conforme necessário
+                    'servicoId': servicoIdSelecionado,
                     'data': dataStr,
                     'horario': horarioSelecionado,
                     'taxiDog': taxiDog == 'Sim',
@@ -401,9 +500,22 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
                     'produtos': produtosSelecionados,
                     'servicosAdicionais': servicosAdicionaisSelecionados,
                   };
+                  // Só adiciona tosaId se o serviço for 'Banho e tosa' e houver seleção
+                  if (servico == 'Banho e tosa' && tosaIdSelecionado != null) {
+                    body['tosaId'] = tosaIdSelecionado;
+                  }
                   print(
                     jsonEncode(body),
                   ); // Depuração: mostra o corpo enviado ao backend
+                  
+                  // Validar se temos um serviço selecionado
+                  if (servicoIdSelecionado == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Por favor, selecione um serviço válido.')),
+                    );
+                    return;
+                  }
+                  
                   final response = await http.post(
                     Uri.parse('${ApiConfig.baseUrl}/agendamentos'),
                     headers: {'Content-Type': 'application/json'},
@@ -494,11 +606,31 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
           checkmarkColor: Colors.white,
           onSelected: (v) {
             final newValues = List<String>.from(values);
-            if (v) {
-              newValues.add(item);
+            
+            // Se "Nenhum serviço adicional" foi selecionado
+            if (item == 'Nenhum serviço adicional') {
+              if (v) {
+                // Limpa todos os outros e seleciona apenas este
+                newValues.clear();
+                newValues.add(item);
+              } else {
+                // Remove apenas este item
+                newValues.remove(item);
+              }
             } else {
-              newValues.remove(item);
+              // Se outro serviço foi selecionado, remove "Nenhum serviço adicional"
+              if (v) {
+                newValues.remove('Nenhum serviço adicional');
+                newValues.add(item);
+              } else {
+                newValues.remove(item);
+                // Se não há mais nenhum serviço selecionado, adiciona "Nenhum serviço adicional"
+                if (newValues.isEmpty) {
+                  newValues.add('Nenhum serviço adicional');
+                }
+              }
             }
+            
             onChanged(newValues);
           },
         );
@@ -506,44 +638,6 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
     );
   }
 
-  Widget _buildIconSelector({
-    required String label,
-    required List<IconData> icons,
-    required int? selected,
-    required ValueChanged<int> onSelect,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
-        const SizedBox(height: 8),
-        SizedBox(
-          height: 64,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: icons.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 12),
-            itemBuilder: (context, i) => GestureDetector(
-              onTap: () => onSelect(i),
-              child: Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  color: selected == i ? Colors.blue.shade50 : Colors.white,
-                  border: Border.all(
-                    color: selected == i ? Colors.blue : Colors.grey.shade300,
-                    width: 2,
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Icon(icons[i], size: 36, color: Colors.black),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 
   Widget _buildProdutoSelector({
     required String label,
@@ -559,7 +653,7 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
         Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
         const SizedBox(height: 8),
         produtos.isEmpty
-            ? const Text('Nenhum produto disponível.')
+            ? Text(isPresilha ? 'Nenhuma presilha disponível.' : (isPerfume ? 'Nenhum perfume disponível.' : 'Nenhum produto disponível.'))
             : SizedBox(
                 height: 90,
                 child: Row(
@@ -584,12 +678,14 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
                         ),
                         child: Center(
                           child: Text(
-                            'Nenhum',
+                            isPresilha ? 'Nenhuma\npresilha' : (isPerfume ? 'Nenhum\nperfume' : 'Nenhum'),
+                            textAlign: TextAlign.center,
                             style: TextStyle(
                               color: selecionado == null
                                   ? Colors.blue
                                   : Colors.black54,
                               fontWeight: FontWeight.bold,
+                              fontSize: 12,
                             ),
                           ),
                         ),

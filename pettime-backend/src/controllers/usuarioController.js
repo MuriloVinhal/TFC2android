@@ -97,9 +97,50 @@ module.exports = {
         const { nome, email, telefone, endereco, senha, tipo } = req.body;
 
         try {
+            // Validar senha
+            if (!validarEmail(email)) {
+                return res.status(400).json({ erro: 'E-mail inválido.', message: 'E-mail inválido.' });
+            }
+
             const usuarioExistente = await Usuario.findOne({ where: { email } });
             if (usuarioExistente) {
                 return res.status(400).json({ erro: 'E-mail já cadastrado.', message: 'E-mail já cadastrado.' });
+            }
+
+            // Validar critérios de senha
+            if (!senha || senha.length < 8) {
+                return res.status(400).json({ 
+                    erro: 'A senha deve ter no mínimo 8 caracteres.', 
+                    message: 'A senha deve ter no mínimo 8 caracteres.' 
+                });
+            }
+
+            if (!/[A-Z]/.test(senha)) {
+                return res.status(400).json({ 
+                    erro: 'A senha deve conter pelo menos uma letra maiúscula.', 
+                    message: 'A senha deve conter pelo menos uma letra maiúscula.' 
+                });
+            }
+
+            if (!/[a-z]/.test(senha)) {
+                return res.status(400).json({ 
+                    erro: 'A senha deve conter pelo menos uma letra minúscula.', 
+                    message: 'A senha deve conter pelo menos uma letra minúscula.' 
+                });
+            }
+
+            if (!/[0-9]/.test(senha)) {
+                return res.status(400).json({ 
+                    erro: 'A senha deve conter pelo menos um número.', 
+                    message: 'A senha deve conter pelo menos um número.' 
+                });
+            }
+
+            if (!/[!@#\$%\^&\*\(\)_\+\-=\[\]{};:'",.<>?]/.test(senha)) {
+                return res.status(400).json({ 
+                    erro: 'A senha deve conter pelo menos um símbolo especial.', 
+                    message: 'A senha deve conter pelo menos um símbolo especial.' 
+                });
             }
 
             const hash = await bcrypt.hash(senha, 10);
