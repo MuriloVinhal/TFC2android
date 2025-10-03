@@ -232,17 +232,16 @@ class _ProfilePageState extends State<ProfilePage> {
     // Se os campos de senha estão sendo preenchidos, aplica validações
     if (novaSenhaController.text.isNotEmpty ||
         confirmarSenhaController.text.isNotEmpty) {
-      
       // Valida a nova senha com os critérios rigorosos
       String? erroSenha = FormValidator.validarSenha(novaSenhaController.text);
       if (erroSenha != null) {
         return erroSenha;
       }
-      
+
       // Valida confirmação de senha
       String? erroConfirmacao = FormValidator.validarConfirmacaoSenha(
-        novaSenhaController.text, 
-        confirmarSenhaController.text
+        novaSenhaController.text,
+        confirmarSenhaController.text,
       );
       if (erroConfirmacao != null) {
         return erroConfirmacao;

@@ -18,22 +18,24 @@ const createAgendamento = async (req, res) => {
         } = req.body;
         
         // Validar se o horário já está ocupado por um agendamento com status diferente de aguardando ou reprovado
-        const agendamentosExistentes = await Agendamento.findAll({
-            where: {
-                data: data,
-                horario: horario,
-                status: {
-                  [db.Sequelize.Op.notIn]: ['aguardando', 'reprovado', null]
+            // Bloquear horário para status que ocupam a agenda
+            const statusQueOcupam = ['aprovado', 'em espera', 'a caminho', 'concluido'];
+            const agendamentosExistentes = await Agendamento.findAll({
+                where: {
+                    data: data,
+                    horario: horario,
+                    status: {
+                      [db.Sequelize.Op.in]: statusQueOcupam
+                    }
                 }
-            }
-        });
-
-        if (agendamentosExistentes.length > 0) {
-            return res.status(400).json({ 
-                message: 'Este horário já está ocupado. Por favor, escolha outro horário.',
-                erro: 'Este horário já está ocupado. Por favor, escolha outro horário.'
             });
-        }
+
+            if (agendamentosExistentes.length > 0) {
+                return res.status(400).json({ 
+                    message: 'Este horário já está ocupado por um agendamento. Por favor, escolha outro horário.',
+                    erro: 'Este horário já está ocupado por um agendamento. Por favor, escolha outro horário.'
+                });
+            }
         
         const novoAgendamento = await Agendamento.create({
             petId,
@@ -82,10 +84,11 @@ export const getAgendamentos = async (req, res) => {
             const end = new Date(data);
             end.setHours(23, 59, 59, 999);
             where.data = { $gte: start, $lte: end };
-            
-            // Para consulta de horários ocupados, filtrar apenas agendamentos aprovados
+            // Para consulta de horários ocupados, filtrar todos status que ocupam o horário
             if (!petId) {
-                where.status = 'aprovado';
+                where.status = {
+                  [db.Sequelize.Op.in]: ['aprovado', 'em espera', 'a caminho', 'concluido']
+                };
             }
         }
         if (petId) {

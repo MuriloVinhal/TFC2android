@@ -65,10 +65,10 @@ class _LoginPageState extends State<LoginPage> {
       } else {
         final erro = jsonDecode(resposta.body);
         final mensagemErro = ErrorHandler.extractErrorMessage(erro);
-        
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(mensagemErro)),
-        );
+
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(mensagemErro)));
       }
     } catch (e) {
       setState(() => carregando = false);

@@ -58,14 +58,15 @@ class _RegisterPageState extends State<RegisterPage> {
         Navigator.pop(context);
       } else {
         final erro = jsonDecode(resposta.body);
-        final mensagemErro = ErrorHandler.extractErrorMessage(erro, 'Erro ao cadastrar');
-        
-        print(
-          'Erro ao cadastrar: ${resposta.statusCode} - ${resposta.body}',
+        final mensagemErro = ErrorHandler.extractErrorMessage(
+          erro,
+          'Erro ao cadastrar',
         );
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(mensagemErro)),
-        );
+
+        print('Erro ao cadastrar: ${resposta.statusCode} - ${resposta.body}');
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(mensagemErro)));
       }
     } catch (e) {
       setState(() => carregando = false);

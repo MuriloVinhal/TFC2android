@@ -59,7 +59,9 @@ class FormValidator {
     }
 
     // Verifica se tem pelo menos um símbolo
-    if (!RegExp(r'''[!@#\$%\^&\*\(\)_\+\-=\[\]{};:'",.<>?]''').hasMatch(senha)) {
+    if (!RegExp(
+      r'''[!@#\$%\^&\*\(\)_\+\-=\[\]{};:'",.<>?]''',
+    ).hasMatch(senha)) {
       return 'Senha deve conter pelo menos um símbolo';
     }
 

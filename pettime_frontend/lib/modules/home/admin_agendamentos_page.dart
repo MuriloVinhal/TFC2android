@@ -654,7 +654,9 @@ class _AdminAgendamentosPageState extends State<AdminAgendamentosPage> {
                         context: context,
                         builder: (context) => AlertDialog(
                           title: Text('Confirmar reprovação'),
-                          content: Text('Deseja realmente reprovar este agendamento? O cliente será notificado.'),
+                          content: Text(
+                            'Deseja realmente reprovar este agendamento? O cliente será notificado.',
+                          ),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.of(context).pop(false),

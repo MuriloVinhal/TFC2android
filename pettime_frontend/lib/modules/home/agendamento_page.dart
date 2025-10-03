@@ -145,10 +145,8 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
       final respServicos = await http.get(
         Uri.parse('${ApiConfig.baseUrl}/servico'),
       );
-      final respTosas = await http.get(
-        Uri.parse('${ApiConfig.baseUrl}/tosas'),
-      );
-      
+      final respTosas = await http.get(Uri.parse('${ApiConfig.baseUrl}/tosas'));
+
       if (respServicos.statusCode == 200) {
         setState(() {
           servicosDisponiveis = List<Map<String, dynamic>>.from(
@@ -157,7 +155,7 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
         });
         print('✅ Serviços carregados: $servicosDisponiveis');
       }
-      
+
       if (respTosas.statusCode == 200) {
         setState(() {
           tosasDisponiveis = List<Map<String, dynamic>>.from(
@@ -195,7 +193,9 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
       });
       print('📅 Horários ocupados: $horariosOcupados');
     } else {
-      print('❌ Erro ao buscar agendamentos: ${response.statusCode} - ${response.body}');
+      print(
+        '❌ Erro ao buscar agendamentos: ${response.statusCode} - ${response.body}',
+      );
     }
   }
 
@@ -374,17 +374,19 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
                     );
                     return;
                   }
-                  
+
                   // Validar se o horário não está ocupado
                   if (horariosOcupados.contains(horarioSelecionado)) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Este horário não está mais disponível. Por favor, escolha outro horário.'),
+                        content: Text(
+                          'Este horário não está mais disponível. Por favor, escolha outro horário.',
+                        ),
                       ),
                     );
                     return;
                   }
-                  
+
                   final prefs = await SharedPreferences.getInstance();
                   final usuarioId = prefs.getInt(
                     'user_id',
@@ -429,7 +431,9 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
                   // Mapear nomes dos serviços adicionais para IDs (ajuste conforme seu backend)
                   final List<int> servicosAdicionaisSelecionados =
                       servicosAdicionais
-                          .where((s) => s != 'Nenhum serviço adicional') // Filtra a opção "Nenhum"
+                          .where(
+                            (s) => s != 'Nenhum serviço adicional',
+                          ) // Filtra a opção "Nenhum"
                           .map((s) {
                             if (s == 'Corte de unha') return 1;
                             if (s == 'Escovação') return 2;
@@ -450,40 +454,60 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
                   if (servico != null && servicosDisponiveis.isNotEmpty) {
                     // Busca por igualdade exata
                     final encontrado = servicosDisponiveis.firstWhere(
-                      (s) => s['tipo'] != null &&
-                        s['tipo'].toString().trim().toLowerCase() == servico!.trim().toLowerCase(),
+                      (s) =>
+                          s['tipo'] != null &&
+                          s['tipo'].toString().trim().toLowerCase() ==
+                              servico!.trim().toLowerCase(),
                       orElse: () {
-                        print('Serviço "$servico" não encontrado, usando o primeiro disponível.');
+                        print(
+                          'Serviço "$servico" não encontrado, usando o primeiro disponível.',
+                        );
                         return servicosDisponiveis.first;
                       },
                     );
                     servicoIdSelecionado = encontrado['id'];
-                    print('Resultado do mapeamento: servicoIdSelecionado = $servicoIdSelecionado');
-                    if (encontrado['tipo'].toString().trim().toLowerCase() != servico!.trim().toLowerCase()) {
-                      print('⚠️ Atenção: serviço selecionado "$servico" não bate com nenhum tipo do backend.');
+                    print(
+                      'Resultado do mapeamento: servicoIdSelecionado = $servicoIdSelecionado',
+                    );
+                    if (encontrado['tipo'].toString().trim().toLowerCase() !=
+                        servico!.trim().toLowerCase()) {
+                      print(
+                        '⚠️ Atenção: serviço selecionado "$servico" não bate com nenhum tipo do backend.',
+                      );
                     }
                   }
                   // Se ainda não encontrou, usa o primeiro disponível
-                  if (servicoIdSelecionado == null && servicosDisponiveis.isNotEmpty) {
+                  if (servicoIdSelecionado == null &&
+                      servicosDisponiveis.isNotEmpty) {
                     servicoIdSelecionado = servicosDisponiveis.first['id'];
-                    print('Serviço não reconhecido, usando o primeiro disponível: ID $servicoIdSelecionado');
+                    print(
+                      'Serviço não reconhecido, usando o primeiro disponível: ID $servicoIdSelecionado',
+                    );
                   }
-                  
+
                   // Mapear tosa selecionada para ID
                   int? tosaIdSelecionado;
                   if (tosa != null && tosasDisponiveis.isNotEmpty) {
                     if (tosa == 'Tosa completa') {
-                      tosaIdSelecionado = tosasDisponiveis
-                          .firstWhere((t) => t['tipo'].toString().toLowerCase().contains('completa'), 
-                              orElse: () => tosasDisponiveis.first)['id'];
+                      tosaIdSelecionado = tosasDisponiveis.firstWhere(
+                        (t) => t['tipo'].toString().toLowerCase().contains(
+                          'completa',
+                        ),
+                        orElse: () => tosasDisponiveis.first,
+                      )['id'];
                     } else if (tosa == 'Tosa bebê') {
-                      tosaIdSelecionado = tosasDisponiveis
-                          .firstWhere((t) => t['tipo'].toString().toLowerCase().contains('bebê'), 
-                              orElse: () => tosasDisponiveis.first)['id'];
+                      tosaIdSelecionado = tosasDisponiveis.firstWhere(
+                        (t) =>
+                            t['tipo'].toString().toLowerCase().contains('bebê'),
+                        orElse: () => tosasDisponiveis.first,
+                      )['id'];
                     } else if (tosa == 'Tosa higiênica') {
-                      tosaIdSelecionado = tosasDisponiveis
-                          .firstWhere((t) => t['tipo'].toString().toLowerCase().contains('higiênica'), 
-                              orElse: () => tosasDisponiveis.first)['id'];
+                      tosaIdSelecionado = tosasDisponiveis.firstWhere(
+                        (t) => t['tipo'].toString().toLowerCase().contains(
+                          'higiênica',
+                        ),
+                        orElse: () => tosasDisponiveis.first,
+                      )['id'];
                     }
                   }
 
@@ -507,15 +531,19 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
                   print(
                     jsonEncode(body),
                   ); // Depuração: mostra o corpo enviado ao backend
-                  
+
                   // Validar se temos um serviço selecionado
                   if (servicoIdSelecionado == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Por favor, selecione um serviço válido.')),
+                      const SnackBar(
+                        content: Text(
+                          'Por favor, selecione um serviço válido.',
+                        ),
+                      ),
                     );
                     return;
                   }
-                  
+
                   final response = await http.post(
                     Uri.parse('${ApiConfig.baseUrl}/agendamentos'),
                     headers: {'Content-Type': 'application/json'},
@@ -606,7 +634,7 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
           checkmarkColor: Colors.white,
           onSelected: (v) {
             final newValues = List<String>.from(values);
-            
+
             // Se "Nenhum serviço adicional" foi selecionado
             if (item == 'Nenhum serviço adicional') {
               if (v) {
@@ -630,14 +658,13 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
                 }
               }
             }
-            
+
             onChanged(newValues);
           },
         );
       }).toList(),
     );
   }
-
 
   Widget _buildProdutoSelector({
     required String label,
@@ -653,7 +680,13 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
         Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
         const SizedBox(height: 8),
         produtos.isEmpty
-            ? Text(isPresilha ? 'Nenhuma presilha disponível.' : (isPerfume ? 'Nenhum perfume disponível.' : 'Nenhum produto disponível.'))
+            ? Text(
+                isPresilha
+                    ? 'Nenhuma presilha disponível.'
+                    : (isPerfume
+                          ? 'Nenhum perfume disponível.'
+                          : 'Nenhum produto disponível.'),
+              )
             : SizedBox(
                 height: 90,
                 child: Row(
@@ -678,7 +711,9 @@ class _AgendamentoPageState extends State<AgendamentoPage> {
                         ),
                         child: Center(
                           child: Text(
-                            isPresilha ? 'Nenhuma\npresilha' : (isPerfume ? 'Nenhum\nperfume' : 'Nenhum'),
+                            isPresilha
+                                ? 'Nenhuma\npresilha'
+                                : (isPerfume ? 'Nenhum\nperfume' : 'Nenhum'),
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: selecionado == null
